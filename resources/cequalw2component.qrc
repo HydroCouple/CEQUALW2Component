@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/CEQUALW2Component">
+        <file alias="cequalw2componenticon">images/cequalw2componenticon.png</file>
+    </qresource>
+</RCC>
