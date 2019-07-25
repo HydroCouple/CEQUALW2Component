@@ -19,6 +19,7 @@ DEFINES += USE_OPENMP
 DEFINES += USE_MPI
 DEFINES += USE_NETCDF
 DEFINES += USE_CHPC
+CE_QUAL_W2_VERSION = 4.1.0
 
 #Compile as library or executable
 contains(DEFINES,CEQUALW2COMPONENT_LIBRARY){
@@ -42,13 +43,17 @@ INCLUDEPATH += .\
 
 HEADERS += ./include/stdafx.h\
            ./include/cequalw2component_global.h \
-           ./include/cequalw2component.h \ 
-           ./include/cequalw2componentinfo.h 
+           ./include/cequalw2component.h \
+           ./include/branchinput.h \
+           ./include/cequalw2componentinfo.h  \
+           include/branchoutput.h
 
 SOURCES +=./src/stdafx.cpp \
           ./src/cequalw2component.cpp \
           ./src/cequalw2componentinfo.cpp \
-          ./src/main.cpp 
+          ./src/main.cpp  \
+          ./src/branchinput.cpp \
+          src/branchoutput.cpp
 
 macx{
 
@@ -214,7 +219,7 @@ CONFIG(debug, debug|release) {
     }
 
     macx {
-       QMAKE_CXXFLAGS += -O3
+       QMAKE_CXXFLAGS += -O1
     }
 
     linux {
@@ -230,6 +235,7 @@ CONFIG(debug, debug|release) {
    macx{
 
     QMAKE_POST_LINK += "cp -a ./../HydroCoupleSDK/build/debug/*HydroCoupleSDK.* ./build/debug/";
+    QMAKE_POST_LINK += "cp -a ./src/CE-QUAL-W2-4.1.0/*.dylib ./build/debug/";
     LIBS += -L./../HydroCoupleSDK/build/debug -lHydroCoupleSDK
 
     }
@@ -237,6 +243,7 @@ CONFIG(debug, debug|release) {
    linux{
 
     QMAKE_POST_LINK += "cp -a ./../HydroCoupleSDK/build/debug/*HydroCoupleSDK.* ./build/debug/";
+    QMAKE_POST_LINK += "cp -a ./src/CE-QUAL-W2-4.1.0/CE-QUAL-W2-4.1.0.* ./build/debug/";
     LIBS += -L./../HydroCoupleSDK/build/debug -lHydroCoupleSDK
 
     }
@@ -244,6 +251,7 @@ CONFIG(debug, debug|release) {
    win32{
 
     QMAKE_POST_LINK += "copy /B .\..\HydroCoupleSDK\build\debug\HydroCoupleSDK* .\build\debug"
+    QMAKE_POST_LINK += "copy /B .\src\CE-QUAL-W2-4.1.0.* .\build\debug"
     LIBS += -L./../HydroCoupleSDK/build/debug -lHydroCoupleSDK1
 
     }
@@ -279,18 +287,21 @@ CONFIG(release, debug|release) {
          #MacOS
          macx{
              DESTDIR = lib/macx
+             QMAKE_POST_LINK += "cp -a ./src/CE-QUAL-W2-4.1.0/*.dylib ./lib/macx/";
              QMAKE_POST_LINK += "cp -a ./../HydroCoupleSDK/lib/macx/*HydroCoupleSDK.* ./lib/macx/";
         }
 
          #Linux
          linux{
              DESTDIR = lib/linux
+             QMAKE_POST_LINK += "cp -a ./src/CE-QUAL-W2-4.1.0/CE-QUAL-W2-4.1.0.* ./lib/linux/";
              QMAKE_POST_LINK += "cp -a ./../HydroCoupleSDK/lib/linux/*HydroCoupleSDK.* ./lib/linux/";
         }
 
          #Windows
          win32{
              DESTDIR = lib/win32
+             QMAKE_POST_LINK += "copy /B .\..\HydroCoupleSDK\lib\win32\HydroCoupleSDK* .\lib\win32";
              QMAKE_POST_LINK += "copy /B .\..\HydroCoupleSDK\lib\win32\HydroCoupleSDK* .\lib\win32";
         }
     } else {

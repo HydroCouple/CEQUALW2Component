@@ -24,10 +24,23 @@
 #include "cequalw2componentinfo.h"
 #include "temporal/abstracttimemodelcomponent.h"
 
+/*!
+ *
+ */
+typedef int (*CE_QUAL_W2_Initialize)(const char modelDirectory[]);
+typedef int (*CE_QUAL_W2_Generic)();
+
+class Dimension;
+class Unit;
+class Quantity;
 
 class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelComponent,
     public virtual HydroCouple::ICloneableModelComponent
 {
+
+    friend class BranchInput;
+    friend class BranchOutput;
+
     Q_OBJECT
     Q_INTERFACES(HydroCouple::ICloneableModelComponent)
 
@@ -38,12 +51,19 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelCompo
      * \param id Unique identifier for this component instance.
      * \param modelComponentInfo the parent ModelComponentInfo that generated this component instance.
      */
-    CEQUALW2Component(const QString &id, CEQUALW2ComponentInfo* modelComponentInfo = nullptr);
+    CEQUALW2Component(const QString &id, void* libraryHandle,  CEQUALW2ComponentInfo* modelComponentInfo = nullptr);
+
 
     /*!
      * \brief ~CEQUALW2Component destructor
      */
-    virtual ~CEQUALW2Component();
+    virtual ~CEQUALW2Component() override;
+
+
+    /*!
+     * \brief setFunctionPointers
+     */
+    void setFunctionPointers();
 
     /*!
      * \brief validate validates this component model instance
@@ -61,6 +81,7 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelCompo
      * \param requiredOutputs
      */
     void update(const QList<HydroCouple::IOutput*> &requiredOutputs = QList<HydroCouple::IOutput*>()) override;
+
 
     /*!
      * \brief finish
@@ -136,12 +157,36 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelCompo
      */
     void createOutputs() override;
 
+    /*!
+     * \brief getCurrentJulianDateTime
+     * \return
+     */
+    double getCurrentJulianDateTime();
+
+
+ signals:
+
+    void onAboutToDelete(CEQUALW2Component *component);
 
   private:
 
     IdBasedArgumentString *m_inputFilesArgument;
     CEQUALW2Component *m_parent = nullptr;
     QList<HydroCouple::ICloneableModelComponent*> m_clones;
+    void *m_libHandle;
+    CE_QUAL_W2_Initialize m_initializeFunction;
+    CE_QUAL_W2_Generic m_prepareForUpdateFunction, m_updateFunction, m_finalizeFunction;
+    int *m_startYear;
+    double *m_startDateTime, *m_endDateTime, *m_currentDateTime;
+    int *m_NWB, *m_NBR, *m_KMX, *m_IMX, *m_NTR, *m_NST, *m_NWD, *n_NSTR;
+    double **m_QSTR,  **m_TaveSTR, *m_QIND, *m_TIND;
+    bool *m_modelFinished;
+    double m_startJulianDate;
+    Dimension *m_timeDimension;
+    Unit   *m_heatFluxUnit,
+    *m_temperatureUnit;
+
+
 };
 
 #endif //CEQUALW2COMPONENT_H

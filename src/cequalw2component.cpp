@@ -30,56 +30,49 @@
 #include "core/abstractoutput.h"
 #include "core/unit.h"
 #include "core/unitdimensions.h"
+#include "branchinput.h"
+#include "temporal/timedata.h"
+#include  "branchoutput.h"
+
+#ifdef _WIN32 // note the underscore: without it, it's not msdn official!
+#include <windows.h>
+#else
+#include "dlfcn.h"
+#endif
+
+
 
 using namespace HydroCouple;
 
-CEQUALW2Component::CEQUALW2Component(const QString &id, CEQUALW2ComponentInfo *modelComponentInfo)
+CEQUALW2Component::CEQUALW2Component(const QString &id, void *libraryHandle, CEQUALW2ComponentInfo *modelComponentInfo)
   : AbstractTimeModelComponent(id, modelComponentInfo),
     m_inputFilesArgument(nullptr),
-    m_parent(nullptr)
+    m_parent(nullptr),
+    m_libHandle(libraryHandle)
 {
-//  m_timeDimension = new Dimension("TimeDimension",this);
-//  m_geometryDimension = new Dimension("ElementGeometryDimension", this);
+  m_timeDimension = new Dimension("TimeDimension",this);
 
-//  m_radiationFluxUnit = new Unit(this);
-//  m_radiationFluxUnit->setCaption("Radiation Flux (W/m^2)");
-//  m_radiationFluxUnit->setConversionFactorToSI(1.0);
-//  m_radiationFluxUnit->setOffsetToSI(0.0);
-//  m_radiationFluxUnit->dimensionsInternal()->setPower(HydroCouple::Mass, 1.0);
-//  m_radiationFluxUnit->dimensionsInternal()->setPower(HydroCouple::Time, -3.0);
+  m_heatFluxUnit = new Unit(this);
+  m_heatFluxUnit->setCaption("Heat Source (W or J/s)");
+  m_heatFluxUnit->setConversionFactorToSI(1.0);
+  m_heatFluxUnit->setOffsetToSI(0.0);
+  m_heatFluxUnit->dimensionsInternal()->setPower(HydroCouple::Mass, 1.0);
+  m_heatFluxUnit->dimensionsInternal()->setPower(HydroCouple::Length, 2.0);
+  m_heatFluxUnit->dimensionsInternal()->setPower(HydroCouple::Time, -3.0);
 
-//  m_heatFluxUnit = new Unit(this);
-//  m_heatFluxUnit->setCaption("Heat Source (W or J/s)");
-//  m_heatFluxUnit->setConversionFactorToSI(1.0);
-//  m_heatFluxUnit->setOffsetToSI(0.0);
-//  m_heatFluxUnit->dimensionsInternal()->setPower(HydroCouple::Mass, 1.0);
-//  m_heatFluxUnit->dimensionsInternal()->setPower(HydroCouple::Length, 2.0);
-//  m_heatFluxUnit->dimensionsInternal()->setPower(HydroCouple::Time, -3.0);
+  m_temperatureUnit = new Unit(this);
+  m_temperatureUnit->setCaption("Temperature (°C)");
+  m_temperatureUnit->setConversionFactorToSI(1.0);
+  m_temperatureUnit->setOffsetToSI(273.15);
+  m_temperatureUnit->dimensionsInternal()->setPower(HydroCouple::Temperature, 1.0);
 
-//  m_temperatureUnit = new Unit(this);
-//  m_temperatureUnit->setCaption("Temperature (°C)");
-//  m_temperatureUnit->setConversionFactorToSI(1.0);
-//  m_temperatureUnit->setOffsetToSI(273.15);
-//  m_temperatureUnit->dimensionsInternal()->setPower(HydroCouple::Temperature, 1.0);
-
-//  m_soluteFluxUnit = new Unit(this);
-//  m_soluteFluxUnit->setCaption("Mass Flux (kg/s)");
-//  m_soluteFluxUnit->dimensionsInternal()->setPower(HydroCouple::Mass, 1.0);
-//  m_soluteFluxUnit->dimensionsInternal()->setPower(HydroCouple::Time, -1.0);
-
-//  m_soluteUnit = new Unit(this);
-//  m_soluteUnit->setCaption("Concentration (kg/m^3)");
-//  m_soluteUnit->dimensionsInternal()->setPower(HydroCouple::Mass, 1.0);
-//  m_soluteUnit->dimensionsInternal()->setPower(HydroCouple::Length, -3.0);
-
-//  m_soluteConcQuantity = new Quantity(QVariant::Double, m_soluteUnit, this);
-//  m_soluteConcFluxQuantity = new Quantity(QVariant::Double, m_soluteFluxUnit, this);
-
+  setFunctionPointers();
   createArguments();
 }
 
 CEQUALW2Component::~CEQUALW2Component()
 {
+  emit onAboutToDelete(this);
 
   initializeFailureCleanUp();
 
@@ -95,6 +88,42 @@ CEQUALW2Component::~CEQUALW2Component()
     m_parent->removeClone(this);
     m_parent = nullptr;
   }
+}
+
+void CEQUALW2Component::setFunctionPointers()
+{
+#ifdef _WIN32 // note the underscore: without it, it's not msdn official!
+  if (m_libHandle)
+  {
+    m_initializeFunction = (CE_QUAL_W2_Initialize)(GetProcAddress(m_libHandle, "CE_QUAL_W2_Initialize"));
+    m_updateFunction = (CE_QUAL_W2_Generic)(GetProcAddress(m_libHandle, "CE_QUAL_W2_Performstep"));
+    m_finalizeFunction = (CE_QUAL_W2_Generic)(GetProcAddress(m_libHandle, "CE_QUAL_W2_Dispose"));
+    m_prepareForUpdateFunction = (CE_QUAL_W2_Generic)(GetProcAddress(m_libHandle, "CE_QUAL_W2_PrepareForStep"));
+  }
+  else
+  {
+    m_initializeFunction = nullptr;
+    m_updateFunction = nullptr;
+    m_finalizeFunction = nullptr;
+    m_prepareForUpdateFunction = nullptr;
+  }
+#else
+
+  if (m_libHandle)
+  {
+    m_initializeFunction = (CE_QUAL_W2_Initialize)(dlsym(m_libHandle, "CE_QUAL_W2_Initialize"));
+    m_updateFunction = (CE_QUAL_W2_Generic)(dlsym(m_libHandle, "CE_QUAL_W2_Performstep"));
+    m_finalizeFunction = (CE_QUAL_W2_Generic)(dlsym(m_libHandle, "CE_QUAL_W2_Dispose"));
+    m_prepareForUpdateFunction = (CE_QUAL_W2_Generic)(dlsym(m_libHandle, "CE_QUAL_W2_PrepareForStep"));
+  }
+  else
+  {
+    m_initializeFunction = nullptr;
+    m_updateFunction = nullptr;
+    m_finalizeFunction = nullptr;
+    m_prepareForUpdateFunction = nullptr;
+  }
+#endif
 }
 
 QList<QString> CEQUALW2Component::validate()
@@ -117,85 +146,105 @@ QList<QString> CEQUALW2Component::validate()
 
 void CEQUALW2Component::prepare()
 {
-//  if(!isPrepared() && isInitialized() && m_modelInstance)
-//  {
-//    for(auto output :  outputsInternal())
-//    {
-//      for(auto adaptedOutput : output->adaptedOutputs())
-//      {
-//        adaptedOutput->initialize();
-//      }
-//    }
+  if(!isPrepared() && isInitialized() && m_libHandle)
+  {
+    for(auto output :  outputsInternal())
+    {
+      for(auto adaptedOutput : output->adaptedOutputs())
+      {
+        adaptedOutput->initialize();
+      }
+    }
 
-//    updateOutputValues(QList<HydroCouple::IOutput*>());
+    updateOutputValues(QList<HydroCouple::IOutput*>());
 
-//    setStatus(IModelComponent::Updated ,"Finished preparing model");
-//    setPrepared(true);
-//  }
-//  else
-//  {
-//    setPrepared(false);
-//    setStatus(IModelComponent::Failed ,"Error occured when preparing model");
-//  }
+    setStatus(IModelComponent::Updated ,"Finished preparing model");
+    setPrepared(true);
+  }
+  else
+  {
+    setPrepared(false);
+    setStatus(IModelComponent::Failed ,"Error occured when preparing model");
+  }
 }
 
 void CEQUALW2Component::update(const QList<HydroCouple::IOutput*> &requiredOutputs)
 {
   if(status() == IModelComponent::Updated)
   {
-//    setStatus(IModelComponent::Updating);
+    setStatus(IModelComponent::Updating);
 
-//    double minConsumerTime = std::max(m_modelInstance->currentDateTime(), getMinimumConsumerTime());
+    double minConsumerTime = std::max(getCurrentJulianDateTime(), getMinimumConsumerTime());
+    bool errorOccured = false;
 
-//    while (m_modelInstance->currentDateTime() <= minConsumerTime &&
-//           m_modelInstance->currentDateTime() < m_modelInstance->endDateTime())
-//    {
-//      m_modelInstance->update();
+    while (getCurrentJulianDateTime() <= minConsumerTime && !(*m_modelFinished))
+    {
+      if((*m_prepareForUpdateFunction)() == 0)
+      {
+        applyInputValues();
 
-//      if(progressChecker()->performStep(m_modelInstance->currentDateTime()))
-//      {
-//        setStatus(IModelComponent::Updated , "Simulation performed time-step | DateTime: " + QString::number(m_modelInstance->currentDateTime(), 'f') , progressChecker()->progress());
-//      }
-//    }
+        if((*m_updateFunction)() == 0)
+        {
+          if(progressChecker()->performStep(*m_currentDateTime))
+          {
+            setStatus(IModelComponent::Updated , "Simulation performed time-step | DateTime: " + QString::number(getCurrentJulianDateTime(), 'f') , progressChecker()->progress());
+          }
+        }
+        else
+        {
+          errorOccured = true;
+          break;
+        }
+      }
+      else
+      {
+        errorOccured = true;
+        break;
+      }
+    }
 
-//    updateOutputValues(requiredOutputs);
+    updateOutputValues(requiredOutputs);
 
-//    currentDateTimeInternal()->setJulianDay(m_modelInstance->currentDateTime());
+    currentDateTimeInternal()->setJulianDay(getCurrentJulianDateTime());
 
-//    if(m_modelInstance->currentDateTime() >=  m_modelInstance->endDateTime())
-//    {
-//      setStatus(IModelComponent::Done , "Simulation finished successfully", 100);
-//    }
-//    else
-//    {
-//      if(progressChecker()->performStep(m_modelInstance->currentDateTime()))
-//      {
-//        setStatus(IModelComponent::Updated , "Simulation performed time-step | DateTime: " + QString::number(m_modelInstance->currentDateTime(), 'f') , progressChecker()->progress());
-//      }
-//      else
-//      {
-//        setStatus(IModelComponent::Updated);
-//      }
-//    }
+    if(errorOccured)
+    {
+      setStatus(IModelComponent::Failed,"An unknown error has occurred");
+    }
+    else if((*m_modelFinished) == true)
+    {
+      setStatus(IModelComponent::Done , "Simulation finished successfully", 100);
+    }
+    else
+    {
+      if(progressChecker()->performStep(*m_currentDateTime))
+      {
+        setStatus(IModelComponent::Updated , "Simulation performed time-step | DateTime: " + QString::number(getCurrentJulianDateTime(), 'f') , progressChecker()->progress());
+      }
+      else
+      {
+        setStatus(IModelComponent::Updated);
+      }
+    }
   }
 }
 
 void CEQUALW2Component::finish()
 {
-//  if(isPrepared())
-//  {
-//    setStatus(IModelComponent::Finishing , "CEQUALW2Component with id " + id() + " is being disposed" , 100);
+  if(isPrepared())
+  {
+    setStatus(IModelComponent::Finishing , "CEQUALW2Component with id " + id() + " is being disposed" , 100);
 
-//    std::list<std::string> errors;
-//    m_modelInstance->finalize(errors);
-//    initializeFailureCleanUp();
+    std::list<std::string> errors;
+    (*m_finalizeFunction)();
+    initializeFailureCleanUp();
 
-//    setPrepared(false);
-//    setInitialized(false);
+    setPrepared(false);
+    setInitialized(false);
 
-//    setStatus(IModelComponent::Finished , "CEQUALW2Component with id " + id() + " has been disposed" , 100);
-//    setStatus(IModelComponent::Created , "CEQUALW2Component with id " + id() + " ran successfully and has been re-created" , 100);
-//  }
+    setStatus(IModelComponent::Finished , "CEQUALW2Component with id " + id() + " has been disposed" , 100);
+    setStatus(IModelComponent::Created , "CEQUALW2Component with id " + id() + " ran successfully and has been re-created" , 100);
+  }
 }
 
 ICloneableModelComponent *CEQUALW2Component::parent() const
@@ -293,11 +342,11 @@ bool CEQUALW2Component::removeClone(CEQUALW2Component *component)
 
 void CEQUALW2Component::initializeFailureCleanUp()
 {
-//  if(m_modelInstance)
-//  {
-//    delete m_modelInstance;
-//    m_modelInstance = nullptr;
-//  }
+  //  if(m_modelInstance)
+  //  {
+  //    delete m_modelInstance;
+  //    m_modelInstance = nullptr;
+  //  }
 
 }
 
@@ -309,7 +358,7 @@ void CEQUALW2Component::createArguments()
 void CEQUALW2Component::createInputFileArguments()
 {
   QStringList fidentifiers;
-  fidentifiers.append("W2 Input File");
+  fidentifiers.append("W2 Control File");
 
   Quantity *fquantity = Quantity::unitLessValues("InputFilesQuantity", QVariant::String, this);
   fquantity->setDefaultValue("");
@@ -331,7 +380,6 @@ bool CEQUALW2Component::initializeArguments(QString &message)
 
   if(initialized)
   {
-    createGeometries();
 
     for(AbstractOutput *output : outputsInternal())
       output->updateValues();
@@ -346,64 +394,158 @@ bool CEQUALW2Component::initializeArguments(QString &message)
 
 bool CEQUALW2Component::initializeInputFilesArguments(QString &message)
 {
-  QString inputFilePath = QString((*m_inputFilesArgument)["Input File"]);
+  QString inputFilePath = QString((*m_inputFilesArgument)["W2 Control File"]);
   QFileInfo inputFile = getAbsoluteFilePath(inputFilePath);
 
-  //  if(inputFile.exists())
-  //  {
-  //    initializeFailureCleanUp();
+  printf("test %s\n", inputFile.dir().absolutePath().toStdString().c_str());
 
-  //    m_modelInstance = new CSHModel(this);
-  //    m_modelInstance->setInputFile(inputFile);
+  if(inputFile.dir().exists())
+  {
+    initializeFailureCleanUp();
 
-  //    QString netCDFOutput = QString((*m_inputFilesArgument)["Output NetCDF File"]);
-  //    if(!netCDFOutput.isEmpty() && !netCDFOutput.isNull())
-  //      m_modelInstance->setOutputNetCDFFile(QFileInfo(netCDFOutput));
+    int initialized = (*m_initializeFunction)(inputFile.dir().absolutePath().toStdString().c_str());
 
-  //    QString csvOutput = QString((*m_inputFilesArgument)["Output CSV File"]);
-  //    if(!csvOutput.isEmpty() && !csvOutput.isNull())
-  //      m_modelInstance->setOutputCSVFile(QFileInfo(csvOutput));
+#ifdef _WIN32 // note the underscore: without it, it's not msdn official!
 
-  //    std::list<std::string> errors;
-  //    bool initialized = m_modelInstance->initialize(errors);
+    m_startYear = (int*)GetProcAddress(m_libHandle, "GDAYC_YEAR");
+    m_startDate = (double*)GetProcAddress(m_libHandle, "TMSTRT");
+    m_endDateTime = (double*)GetProcAddress(m_libHandle, "TMEND");
+    m_currentDateTime = (double*)GetProcAddress(m_libHandle, "JDAY");
+    m_modelFinished  = (bool*)GetProcAddress(m_libHandle, "MAIN_END_RUN");0
 
-  //    for (std::string errorMsg : errors)
-  //    {
-  //      message += "/n" + QString::fromStdString(errorMsg);
-  //    }
+    m_NWB = (int*)GetProcAddress(m_libHandle,"GLOBAL_NWB");
+    m_NBR = (int*)GetProcAddress(m_libHandle,"GLOBAL_NBR");
+    m_KMX = (int*)GetProcAddress(m_libHandle,"GLOBAL_KMX");
+    m_IMX = (int*)GetProcAddress(m_libHandle,"GLOBAL_IMX");
+    m_NTR = (int*)GetProcAddress(m_libHandle,"GLOBAL_NTR");
+    m_NST = (int*)GetProcAddress(m_libHandle,"GLOBAL_NST");
+    m_NWD = (int*)GetProcAddress(m_libHandle,"GLOBAL_NWD");
+    n_STR = (int*)GetProcAddress(m_libHandle,"SELWC_NSTR");
 
-  //    if(initialized)
-  //    {
-  //      timeHorizonInternal()->setJulianDay(m_modelInstance->startDateTime());
-  //      timeHorizonInternal()->setDuration(m_modelInstance->endDateTime() - m_modelInstance->startDateTime());
-  //      currentDateTimeInternal()->setJulianDay(m_modelInstance->startDateTime());
-  //      progressChecker()->reset(m_modelInstance->startDateTime(), m_modelInstance->endDateTime());
-  //    }
+    m_QSTR = (double**)GetProcAddress(m_libHandle,"SELWC_QSTR_CP");
+    m_TaveSTR = (double**)GetProcAddress(m_libHandle,"SELWC_TAVG_CP");
 
+    m_QIND = (double*)GetProcAddress(m_libHandle,"TVDC_QIND_CP");
+    m_TIND = (double*)GetProcAddress(m_libHandle,"TVDC_TIND_CP");
 
-  //    return initialized;
-  //  }
-  //  else
-  //  {
-  //    message = "Input file does not exist: " + inputFile.absoluteFilePath();
-  //    return false;
-  //  }
+#else
+    m_startYear = (int*)dlsym(m_libHandle, "GDAYC_YEAR");
+    m_startDateTime = (double*)dlsym(m_libHandle, "MAIN_TMSTRT");
+    m_endDateTime = (double*)dlsym(m_libHandle, "MAIN_TMEND");
+    m_currentDateTime = (double*)dlsym(m_libHandle, "SCREENC_JDAY");
+    m_modelFinished  = (bool*)dlsym(m_libHandle, "MAIN_END_RUN");
+
+    m_NWB = (int*)dlsym(m_libHandle,"GLOBAL_NWB");
+    m_NBR = (int*)dlsym(m_libHandle,"GLOBAL_NBR");
+    m_KMX = (int*)dlsym(m_libHandle,"GLOBAL_KMX");
+    m_IMX = (int*)dlsym(m_libHandle,"GLOBAL_IMX");
+    m_NTR = (int*)dlsym(m_libHandle,"GLOBAL_NTR");
+    m_NST = (int*)dlsym(m_libHandle,"GLOBAL_NST");
+    m_NWD = (int*)dlsym(m_libHandle,"GLOBAL_NWD");
+    n_NSTR = (int*)dlsym(m_libHandle,"SELWC_NSTR");
+
+    m_QSTR = (double**)dlsym(m_libHandle,"SELWC_QSTR");
+    m_TaveSTR = (double**)dlsym(m_libHandle,"SELWC_TAVG");
+
+    m_QIND = (double*)dlsym(m_libHandle,"TVDC_QIND");
+    m_TIND = (double*)dlsym(m_libHandle,"TVDC_TIND");
+
+#endif
+
+    if(initialized > 0)
+    {
+      return  false;
+    }
+    else
+    {
+      int year = (*m_startYear);
+
+      double startime = (*m_startDateTime);
+      double endtime = (*m_endDateTime);
+      double diff = endtime - startime;
+      QDate date = QDate(year - 1, 12, 31);
+      QDateTime dateTime = QDateTime(date, QTime(), Qt::UTC).addSecs(startime * 86400);
+      m_startJulianDate = SDKTemporal::DateTime::toJulianDays(dateTime);
+      timeHorizonInternal()->setJulianDay(m_startJulianDate);
+      timeHorizonInternal()->setDuration(diff);
+      currentDateTimeInternal()->setJulianDay(m_startJulianDate);
+      progressChecker()->reset(startime, endtime);
+    }
+  }
+  else
+  {
+    message = "Model input file directory does not exist: " + inputFile.absoluteFilePath();
+    return false;
+  }
 
   return true;
 }
 
-void CEQUALW2Component::createGeometries()
-{
-
-}
-
 void CEQUALW2Component::createInputs()
 {
+  QStringList branchIdentifiers;
+
+  for (int i = 0; i < (*m_NBR); i++)
+  {
+    QString id = "BR" + QString::number(i);
+    branchIdentifiers.push_back(id);
+  }
+
+  Quantity *flowQuantity = Quantity::flowInCMS(this);
+  Quantity *temperatureQuantity = new Quantity(QVariant::Double, m_temperatureUnit, this);
+  Dimension *branchIdentifiersDimension = new Dimension("BranchIdentifiersDimension",this);
+
+  BranchInput *branchInflows = new BranchInput("BranchInflows", branchIdentifiers, BranchInput::Inflow,
+                                           branchIdentifiersDimension, m_timeDimension,  flowQuantity, this);
+  branchInflows->setCaption("Branch Inflow (m^3/s)");
+
+  BranchInput *branchInflowTemp = new BranchInput("BranchInflowTemperatures", branchIdentifiers, BranchInput::Temperature,
+                                           branchIdentifiersDimension, m_timeDimension,  temperatureQuantity, this);
+  branchInflowTemp->setCaption("Branch Inflow Temperature (ºC)");
+
+  addInput(branchInflows);
+  addInput(branchInflowTemp);
 
 }
 
 void CEQUALW2Component::createOutputs()
 {
+  QStringList branchIdentifiers;
 
+  for (int i = 0; i < (*m_NBR); i++)
+  {
+    QString id = "BR" + QString::number(i);
+    branchIdentifiers.push_back(id);
+  }
+
+  Quantity *flowQuantity = Quantity::flowInCMS(this);
+  Quantity *heatQuantity = new Quantity(QVariant::Double, m_heatFluxUnit, this);
+  Dimension *branchIdentifiersDimension = new Dimension("BranchIdentifiersDimension",this);
+
+  BranchOutput *flowOutput = new BranchOutput("OutletStructuresFlow",
+                                              branchIdentifiersDimension,
+                                              branchIdentifiers,
+                                              m_timeDimension,
+                                              BranchOutput::Flow,
+                                              flowQuantity,
+                                              this);
+  flowOutput->setCaption("Flow From Outlet Structures (m^3/s)");
+
+
+  BranchOutput *heatOutput = new BranchOutput("OutletStructuresHeat",
+                                              branchIdentifiersDimension,
+                                              branchIdentifiers,
+                                              m_timeDimension,
+                                              BranchOutput::Flow,
+                                              heatQuantity,
+                                              this);
+  heatOutput->setCaption("Heat From Outlet Structures (J/s)");
+
+  addOutput(flowOutput);
+  addOutput(heatOutput);
 }
 
+double CEQUALW2Component::getCurrentJulianDateTime()
+{
+  return  m_startJulianDate + ((*m_currentDateTime)-(*m_startDateTime));
+}
