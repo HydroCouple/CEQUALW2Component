@@ -27,7 +27,7 @@ Recursive Subroutine CEMASedimentModelW2
    Real(8) d1, d2, Depth, UctAvg, Wf, BetaD, Sum1, Sdfz
    Real(8) rgha, rghapda, Caks, Srho, Capda, Yalinp, Value1
    Real(8) SNetFlx, SSettle
-   Real Dummy
+   Real(8) Dummy
    Logical BottomUpdated
 
 !    Common /CEMACmBl1/ CEMAShieldsNumber, SScour, SNetFlx
@@ -464,7 +464,7 @@ Recursive Subroutine CEMASedimentModelW2
                   IF (.NOT. TRAPEZOIDAL(JW)) THEN
                      BH1(K, SegNumI) = BH1(K - 1, SegNumI) - Bnew(K - 1, SegNumI)*H1(K - 1, SegNumI)                              ! SW 1/23/06
                   ELSE
-                                CALL GRID_AREA1(EL(K,SegNumI)-Z(SegNumI),EL(K-1,SegNumI),BH1(K,SegNumI),DUMMY)                                                          !SW 08/03/04
+                     CALL GRID_AREA1(EL(K,SegNumI)-Z(SegNumI),EL(K-1,SegNumI),BH1(K,SegNumI),DUMMY)                                                          !SW 08/03/04
                      BH1(K, SegNumI) = 0.25*H1(K - 1, JW)*(BB(K, SegNumI) + 2.*B(K - 1, SegNumI) + BB(K - 1, SegNumI))
                   ENDIF
                   !VOL(K,SegNumI)              =   BH1(KT,SegNumI)  *DLX(SegNumI)

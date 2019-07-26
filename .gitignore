@@ -42,3 +42,17 @@ target_wrapper.*
 CMakeLists.txt.user*
 *.mod
 *.ico
+
+#Visual studio
+
+*.pdb
+*.obj
+/src/CE-QUAL-W2-4.1.0/My Advisor Results - CE-QUAL-W2-4.1.0/
+/src/CE-QUAL-W2-4.1.0/x64/
+./build
+./debug
+Makefile.Debug
+Makefile
+Makefile.Release
+CEQUALW2Component_resource.rc
+*.pch

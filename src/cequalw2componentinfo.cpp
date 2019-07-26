@@ -60,7 +60,7 @@ IModelComponent *CEQUALW2ComponentInfo::createComponentInstance()
     QFile::copy(lib, libCopy);
 
 #ifdef _WIN32 // note the underscore: without it, it's not msdn official!
-    void *libHandle = LoadLibrary(lib.toStdString().c_str());
+    HMODULE *libHandle = LoadLibrary(lib.toStdString().c_str());
 
     if(!libHandle)
     {
@@ -124,7 +124,7 @@ void CEQUALW2ComponentInfo::onComponentDeleting(CEQUALW2Component *component)
     QPair<QString,void*> pair;
     if(pair.second != nullptr)
     {
-      BOOL result = FreeLibrary(pair.second);
+      BOOL result = FreeLibrary((HMODULE)pair.second);
     }
 
 #else
@@ -157,7 +157,7 @@ void CEQUALW2ComponentInfo::deleteAllFilesAndHandles()
 
     if(it.value().second != nullptr)
     {
-      BOOL result = FreeLibrary(it.value().second);
+      BOOL result = FreeLibrary((HMODULE)it.value().second);
     }
 
 #else

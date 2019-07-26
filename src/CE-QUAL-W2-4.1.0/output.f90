@@ -7,11 +7,13 @@ SUBROUTINE OUTPUT(JDAY, IUPR, IDPR, KBR, ISNP, BL, NBL)
    USE GLOBAL; USE GDAYC; USE GEOMC; USE KINETIC; USE TVDC; USE NAMESC; USE LOGICC
    USE MACROPHYTEC
    Use CEMAVars
+   Use ISO_C_BINDING
    IMPLICIT NONE
 
 ! Type declaration
 
-   REAL                        :: JDAY, LIMIT
+   REAL(C_DOUBLE)              :: JDAY
+   REAL                        ::LIMIT
    INTEGER                     :: NBL, IUPR, IDPR, JH, L, K, J, NLINES, KBR, JAC, JD, JE, JT, JJ, JA
    INTEGER, DIMENSION(IMX)     :: BL
    INTEGER, DIMENSION(IMX, NWB) :: ISNP

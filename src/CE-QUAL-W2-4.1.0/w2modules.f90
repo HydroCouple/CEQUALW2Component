@@ -390,7 +390,7 @@ MODULE SCREENC
   USE PREC
   USE iso_c_binding
   
-  REAL(c_double), BIND(C, NAME="SCREENC_JDAY")               :: JDAY
+  REAL(c_double), BIND(C, NAME="SCREENC_JDAY")   :: JDAY
   REAL                                           :: DLTS1,  JDMIN,  MINDLT, DLTAV,  ELTMJD
   REAL,              ALLOCATABLE, DIMENSION(:)   :: ZMIN,   CMIN,   CMAX,   HYMIN,  HYMAX,  CDMIN,  CDMAX
   INTEGER                                        :: ILOC,   KLOC,   IMIN,   KMIN,   NIT,    NV,     JTT,     JWW

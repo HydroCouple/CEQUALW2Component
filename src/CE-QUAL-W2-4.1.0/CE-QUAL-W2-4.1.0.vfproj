@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioProject ProjectType="typeDynamicLibrary" ProjectCreator="Intel Fortran" Keyword="Dll" Version="11.0" ProjectIdGuid="{446FAC7C-CF96-4A28-85B0-D4F95E699A65}">
+	<Platforms>
+		<Platform Name="Win32"/>
+		<Platform Name="x64"/></Platforms>
+	<Configurations>
+		<Configuration Name="Debug|Win32" ConfigurationType="typeDynamicLibrary">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemWindows" LinkDLL="true"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|Win32" ConfigurationType="typeDynamicLibrary">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFLinkerTool" SuppressStartupBanner="true" SubSystem="subSystemWindows" LinkDLL="true"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Debug|x64" OutputDirectory=".\" ConfigurationType="typeDynamicLibrary">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemWindows" LinkDLL="true"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|x64" ConfigurationType="typeDynamicLibrary">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFLinkerTool" SuppressStartupBanner="true" SubSystem="subSystemWindows" LinkDLL="true"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
+	<Files>
+		<Filter Name="Header Files" Filter="fi;fd;h;inc"/>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
+		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
+		<File RelativePath=".\aerate.f90"/>
+		<File RelativePath=".\az.f90"/>
+		<File RelativePath=".\balances.f90"/>
+		<File RelativePath=".\CEMA_Bubbles_Code_01.f90"/>
+		<File RelativePath=".\CEMA_FFT_Layer_01.f90"/>
+		<File RelativePath=".\CEMA_Input_01.f90"/>
+		<File RelativePath=".\CEMA_Input_Files_Read_01.f90"/>
+		<File RelativePath=".\CEMA_Output_01.f90"/>
+		<File RelativePath=".\CEMA_Sediment_Flux_Model_04.f90"/>
+		<File RelativePath=".\CEMA_Sediment_Model_03.f90"/>
+		<File RelativePath=".\CEMA_Turbidity_01.f90"/>
+		<File RelativePath=".\date.f90"/>
+		<File RelativePath=".\density.f90"/>
+		<File RelativePath=".\endsimulation.f90"/>
+		<File RelativePath=".\envir_perf.f90"/>
+		<File RelativePath=".\fishhabitat.f90"/>
+		<File RelativePath=".\gas-transfer.f90"/>
+		<File RelativePath=".\gate-spill-pipe.f90"/>
+		<File RelativePath=".\heat-exchange.f90"/>
+		<File RelativePath=".\hydroinout.f90"/>
+		<File RelativePath=".\init-cond.f90"/>
+		<File RelativePath=".\init-geom.f90"/>
+		<File RelativePath=".\init-u-elws.f90"/>
+		<File RelativePath=".\init.f90"/>
+		<File RelativePath=".\input.f90"/>
+		<File RelativePath=".\layeraddsub.f90"/>
+		<File RelativePath=".\macrophyte-aux.f90"/>
+		<File RelativePath=".\output.f90"/>
+		<File RelativePath=".\outputa2w2tools.f90"/>
+		<File RelativePath=".\outputinitw2tools.f90"/>
+		<File RelativePath=".\particle.f90"/>
+		<File RelativePath=".\restart.f90"/>
+		<File RelativePath=".\screen_output.f90"/>
+		<File RelativePath=".\shading.f90"/>
+		<File RelativePath=".\tdg.f90"/>
+		<File RelativePath=".\temperature.f90"/>
+		<File RelativePath=".\time-varying-data.f90"/>
+		<File RelativePath=".\transport.f90"/>
+		<File RelativePath=".\update.f90"/>
+		<File RelativePath=".\w2_4.f90"/>
+		<File RelativePath=".\w2modules.f90"/>
+		<File RelativePath=".\w2modules.f90"/>
+		<File RelativePath=".\water-quality.f90"/>
+		<File RelativePath=".\waterbody.f90"/>
+		<File RelativePath=".\withdrawal.f90"/>
+		<File RelativePath=".\wqconstituents.f90"/></Filter></Files>
+	<Globals/></VisualStudioProject>
