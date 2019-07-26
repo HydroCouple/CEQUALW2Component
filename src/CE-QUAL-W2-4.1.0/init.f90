@@ -595,14 +595,6 @@ SUBROUTINE INIT
    SINKC(NST,NBR),POINT_SINK(NST,NBR),QNEW(KMX),tavg(nst,nbr), tavgw(NWD+NSP+NGT+NPI+NPU), &
    CAVG(NST,NBR,NCT),CDAVG(NST,NBR,NDC),CAVGW(NWD+NSP+NGT+NPI+NPU,NCT),CDAVGW(NWD+NSP+NGT+NPI+NPU,NDC))
    
-   
-      !Added for C interoperability -- Caleb Buahin
-   QSTR_P => QSTR
-   TAVG_P => TAVG
-   
-   QSTR_CP = c_loc(QSTR_P(1,1))
-   TAVG_CP = c_loc(TAVG_P(1,1))
-
    TAVGW = 0.0
    TAVG = 0.0
    CAVG = 0.0
@@ -765,6 +757,5 @@ SUBROUTINE INIT
          END DO
       END DO
    END IF
-
    RETURN
 END SUBROUTINE INIT

@@ -99,6 +99,7 @@ void CEQUALW2Component::setFunctionPointers()
     m_updateFunction = (CE_QUAL_W2_Generic)(GetProcAddress(m_libHandle, "CE_QUAL_W2_Performstep"));
     m_finalizeFunction = (CE_QUAL_W2_Generic)(GetProcAddress(m_libHandle, "CE_QUAL_W2_Dispose"));
     m_prepareForUpdateFunction = (CE_QUAL_W2_Generic)(GetProcAddress(m_libHandle, "CE_QUAL_W2_PrepareForStep"));
+    m_getArrayFunction = (CE_QUAL_W2_GetArray)(GetProcAddress(m_libHandle, "CE_QUAL_W2_GetArray"));
   }
   else
   {
@@ -115,6 +116,7 @@ void CEQUALW2Component::setFunctionPointers()
     m_updateFunction = (CE_QUAL_W2_Generic)(dlsym(m_libHandle, "CE_QUAL_W2_Performstep"));
     m_finalizeFunction = (CE_QUAL_W2_Generic)(dlsym(m_libHandle, "CE_QUAL_W2_Dispose"));
     m_prepareForUpdateFunction = (CE_QUAL_W2_Generic)(dlsym(m_libHandle, "CE_QUAL_W2_PrepareForStep"));
+    m_getArrayFunction = (CE_QUAL_W2_GetArray)(dlsym(m_libHandle, "CE_QUAL_W2_GetArray"));
   }
   else
   {
@@ -442,13 +444,31 @@ bool CEQUALW2Component::initializeInputFilesArguments(QString &message)
     m_NTR = (int*)dlsym(m_libHandle,"GLOBAL_NTR");
     m_NST = (int*)dlsym(m_libHandle,"GLOBAL_NST");
     m_NWD = (int*)dlsym(m_libHandle,"GLOBAL_NWD");
-    n_NSTR = (int*)dlsym(m_libHandle,"SELWC_NSTR");
 
-    m_QSTR = (double**)dlsym(m_libHandle,"SELWC_QSTR");
-    m_TaveSTR = (double**)dlsym(m_libHandle,"SELWC_TAVG");
+    int key = 0;
+    void *d0 = nullptr;
+    (*m_getArrayFunction)(&key, &d0);
+    m_NSTR = (int*)d0;
 
-    m_QIND = (double*)dlsym(m_libHandle,"TVDC_QIND");
-    m_TIND = (double*)dlsym(m_libHandle,"TVDC_TIND");
+    void *d1 = nullptr;
+    key = 1;
+    (*m_getArrayFunction)(&key, &d1);
+    m_QSTR = (double*)d1;
+
+    void *d2 = nullptr;
+    key = 2;
+    (*m_getArrayFunction)(&key, &d2);
+    m_TaveSTR = (double*)d2;
+
+    void *d3 = nullptr;
+    key = 3;
+    (*m_getArrayFunction)(&key, &d3);
+    m_QIND = (double*)d3;
+
+    void *d4 = nullptr;
+    key = 4;
+    (*m_getArrayFunction)(&key, &d4);
+    m_TIND = (double*)d4;
 
 #endif
 
@@ -485,7 +505,7 @@ void CEQUALW2Component::createInputs()
 {
   QStringList branchIdentifiers;
 
-  for (int i = 0; i < (*m_NBR); i++)
+  for (int i = 1; i <= (*m_NBR); i++)
   {
     QString id = "BR" + QString::number(i);
     branchIdentifiers.push_back(id);
@@ -512,7 +532,7 @@ void CEQUALW2Component::createOutputs()
 {
   QStringList branchIdentifiers;
 
-  for (int i = 0; i < (*m_NBR); i++)
+  for (int i = 1; i <= (*m_NBR); i++)
   {
     QString id = "BR" + QString::number(i);
     branchIdentifiers.push_back(id);
@@ -536,7 +556,7 @@ void CEQUALW2Component::createOutputs()
                                               branchIdentifiersDimension,
                                               branchIdentifiers,
                                               m_timeDimension,
-                                              BranchOutput::Flow,
+                                              BranchOutput::Heat,
                                               heatQuantity,
                                               this);
   heatOutput->setCaption("Heat From Outlet Structures (J/s)");

@@ -102,7 +102,7 @@ MODULE GLOBAL
   REAL(R8),   POINTER,            DIMENSION(:,:)     :: DLTLIM, VSH,    ADMX,   DM,     ADMZ,   HDG,    HPG,    GRAV
   REAL(R8),   TARGET,ALLOCATABLE, DIMENSION(:,:)     :: T1,     TSS
   REAL(R8),   TARGET,ALLOCATABLE, DIMENSION(:,:,:)   :: C1,     C2,     C1S,    CSSB,   CSSK
-  REAL,      TARGET,ALLOCATABLE, DIMENSION(:,:,:)    :: KF,     CD
+  REAL,       TARGET,ALLOCATABLE, DIMENSION(:,:,:)    :: KF,     CD
   REAL(R8),   TARGET,ALLOCATABLE, DIMENSION(:,:,:)   :: HYD
   REAL,       TARGET,ALLOCATABLE, DIMENSION(:,:,:,:) :: AF,     EF
   REAL(R8),          ALLOCATABLE, DIMENSION(:)       :: ICETH,  ELKT,   HMULT,  CMULT,  CDMULT, WIND2,  AZMAX,  PALT, Z0
@@ -211,9 +211,6 @@ MODULE TVDC
   USE iso_c_binding
   REAL(R8),              ALLOCATABLE, DIMENSION(:)       :: QIN,    QTR,    QDTR,   PR,     ELUH,   ELDH,   QWD,    QSUM
   REAL(R8),              ALLOCATABLE, TARGET, DIMENSION(:)       :: TIN,    TTR,    TDTR,   TPR,    TOUT,   TWDO,   TIND,   QIND
-  REAL(c_double),        POINTER,  DIMENSION(:) :: QIND_P, TIND_P 
-  TYPE(c_ptr), BIND(C, NAME="TVDC_QIND") :: QIND_CP
-  TYPE(c_ptr), BIND(C, NAME="TVDC_TIND") :: TIND_CP
   REAL(R8),              ALLOCATABLE, DIMENSION(:)       :: TAIR,   TDEW,   CLOUD,  PHI,    SRON
   REAL(R8),              ALLOCATABLE, DIMENSION(:,:)     :: CIN,    CTR,    CDTR,   CPR,    CIND,   TUH,    TDH,    QOUT
   REAL(R8),              ALLOCATABLE, DIMENSION(:,:,:)   :: CUH,    CDH
@@ -363,18 +360,13 @@ MODULE SELWC
   !REAL,                  ALLOCATABLE, DIMENSION(:)    :: EWD, TAVGW                   ! cb 1/16/13
   real,                  allocatable, dimension(:)    :: ewd
   REAL(c_double),        ALLOCATABLE, TARGET, DIMENSION(:,:) :: QSTR,  QSW
-  REAL(c_double),         POINTER, DIMENSION(:,:) :: QSTR_P , TAVG_P
-  TYPE(c_ptr), BIND(C,NAME="SELWC_QSTR") :: QSTR_CP
-  TYPE(c_ptr), BIND(C,NAME="SELWC_TAVG") :: TAVG_CP
-  !REAL,                  ALLOCATABLE, DIMENSION(:,:)  :: ESTR,   WSTR, TAVG            ! SW Selective 7/30/09
+  !REAL,                 ALLOCATABLE, DIMENSION(:,:)  :: ESTR,   WSTR, TAVG            ! SW Selective 7/30/09
   real,                  allocatable, dimension(:,:)  :: estr,   wstr                  ! cb 1/16/13
   real(r8),              allocatable, TARGET, dimension(:,:)  :: tavg                  ! cb 1/16/13
   real(r8),              allocatable, dimension(:)    :: tavgw                  ! cb 1/16/13
   REAL(R8),               ALLOCATABLE, DIMENSION(:,:)  :: CAVGW,  CDAVGW
   REAL(R8),               ALLOCATABLE, DIMENSION(:,:,:):: CAVG,   CDAVG
   INTEGER(c_int),         ALLOCATABLE, TARGET, DIMENSION(:) :: NSTR,   NOUT,   KTWD,   KBWD,   KTW,   KBW
-  INTEGER(c_int),         POINTER, DIMENSION(:)    :: NSTR_P,   NOUT_P,   KTWD_P,   KBWD_P,   KTW_P,   KBW_P
-  TYPE(c_ptr), BIND(C, name="SELWC_NSTR") :: NSTR_CP
   INTEGER,               ALLOCATABLE, DIMENSION(:,:)  :: KTSW,   KBSW,   KOUT
   CHARACTER(8),          ALLOCATABLE, DIMENSION(:)    :: DYNSTRUC
 END MODULE SELWC
@@ -699,7 +691,7 @@ MODULE BIOENERGETICS
   CHARACTER*8 BIOC      
   LOGICAL BIOEXP,FISHBIO   
   INTEGER NBIO,NIBIO,KLIM,FISHBIOFN
-  REAL*8 NXBIO,NXTBIO,GAMMAB
+  REAL(8) NXBIO,NXTBIO,GAMMAB
   CHARACTER*72 BIOFN,WEIGHTFN
   CHARACTER*8 BHEAD(20)
   DATA FISHBIOFN /9502/
@@ -740,7 +732,7 @@ Module CEMAVars
     Real(8), Allocatable, Dimension(:) :: SDRegn_Theta_POP_Lab, SDRegn_Theta_POP_Ref, SDRegn_Theta_POP_Ine
     Real(8), Allocatable, Dimension(:) :: SDRegn_MinRate_POP_Lab, SDRegn_MinRate_POP_Ref, SDRegn_MinRate_POP_Ine
     Real(8), Allocatable, Dimension(:) :: SD_NO3p2, SD_NH3p2, SD_NH3Tp2, SD_CH4p2, SD_PO4p2, SD_PO4Tp2
-	Real(8), Allocatable, Dimension(:) :: SD_HSp2, SD_HSTp2, SD_POC22, SD_PON22, SD_POP22
+    Real(8), Allocatable, Dimension(:) :: SD_HSp2, SD_HSTp2, SD_POC22, SD_PON22, SD_POP22
     Real(8), Allocatable, Dimension(:) :: SD_poc2, SD_pon2, SD_pop2, SD_NH3Tp, SD_NO3p, SD_PO4Tp, SD_HSTp
     Real(8), Allocatable, Dimension(:) :: SD_fpon, SD_fpoc, SD_kdiaPON, SD_ThtaPON, SD_kdiaPOC, SD_ThtaPOC
     Real(8), Allocatable, Dimension(:) :: SD_kdiaPOP, SD_ThtaPOP, SD_NH3T, SD_NO3, SD_HST, SD_PO4, SD_FPOP

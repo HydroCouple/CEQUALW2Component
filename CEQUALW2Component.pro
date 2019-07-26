@@ -301,7 +301,7 @@ CONFIG(release, debug|release) {
          #Windows
          win32{
              DESTDIR = lib/win32
-             QMAKE_POST_LINK += "copy /B .\..\HydroCoupleSDK\lib\win32\HydroCoupleSDK* .\lib\win32";
+             QMAKE_POST_LINK += "copy /B .\src\CE-QUAL-W2-4.1.0\CE-QUAL-W2-4.1.0* .\lib\win32";
              QMAKE_POST_LINK += "copy /B .\..\HydroCoupleSDK\lib\win32\HydroCoupleSDK* .\lib\win32";
         }
     } else {

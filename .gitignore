@@ -56,3 +56,8 @@ Makefile
 Makefile.Release
 CEQUALW2Component_resource.rc
 *.pch
+src/.DS_Store
+*.dylib
+*.exe
+*.dSYM
+*.mod

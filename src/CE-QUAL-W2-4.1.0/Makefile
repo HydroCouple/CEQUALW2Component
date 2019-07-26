@@ -1,16 +1,14 @@
 
 # Compiler/Linker settings
 FCOMP = gfortran
-FCFLAGS = -O3 -shared -fPIC -Wall -g -Wextra -pedantic
-FCFLAGSEXE = -O3 -fPIC -Wall -g -Wextra -pedantic
+FCFLAGS = -O2 -shared -fPIC -Wall -g -Wextra -pedantic -Wline-truncation  -Wcharacter-truncation  -Wsurprising  -Waliasing  -Wimplicit-interface  -Wunused-parameter  -fwhole-file   -fbacktrace 
+FCFLAGSEXE = -O2 -fPIC -Wall -g -Wextra -pedantic -Wline-truncation  -Wcharacter-truncation  -Wsurprising  -Waliasing  -Wimplicit-interface  -Wunused-parameter  -fwhole-file   -fbacktrace
 LDFLAGS = -lgfortran
 SHARED_LIB = CE_QUAL_W2.4.1.0.dylib
 EXECUTABLE = CE_QUAL_W2.4.1.0.exe
 SOURCEDIR = .
 
-# SOURCES = test_add_module.f90 
-
-# SOURCES = $(wildcard $(SOURCEDIR)/*.f90)
+          
 SOURCES = w2modules.f90 \
           aerate.f90 \
           az.f90 \
@@ -70,8 +68,6 @@ $(EXECUTABLE): $(OBJECTS)
 %.o: %.f90
 	$(FCOMP) $(FCFLAGS) -c $< -o $@
 
-%.o: %.f90
-	$(FCOMP) $(FCFLAGS) -c $<
 
 clean:
 	rm -rf *.o *.mod *.MOD *.dll *.dSYM *.dylib 

@@ -7,18 +7,18 @@ Subroutine GasBubblesFormation(Radius, DeltaT, Volume)
    ! Type declarations
    IMPLICIT NONE
 
-   Integer nGas, nRelArr, temp   ! nTry
+   Integer :: nGas = 0, nRelArr = 0, temp = 0   ! nTry
    Real(8), Allocatable, Dimension(:) :: Ctot, CgB, C0B, C1B, Source0
    Real(8), Allocatable, Dimension(:) :: K, Mw, Henry
-   Real(8) Volume, Porosity
-   Real(8) DeltaT, Ro, CgT
-   Real(8) RSI, P0, Nbubbles, NbubblesP, NbubbLost
-   Real(8) Pcrit, Pbubb, PbubbT
-   Real(8) NetMass, DisMass, GasMass
-   Real(8) C1T, C0T, CtT, Radius, Vbub, SourceT
-   Real(8) Vbubbles, DiffVolume, BubSedT
-   Real(8) Source
-   Logical FoundOpenArray
+   Real(8) ::Volume, Porosity
+   Real(8) ::DeltaT, Ro, CgT
+   Real(8) ::RSI, P0, Nbubbles, NbubblesP, NbubbLost
+   Real(8) ::Pcrit, Pbubb, PbubbT
+   Real(8) ::NetMass, DisMass, GasMass
+   Real(8) ::C1T, C0T, CtT, Radius, Vbub, SourceT
+   Real(8) ::Vbubbles, DiffVolume, BubSedT
+   Real(8) ::Source
+   Logical ::FoundOpenArray
 
    Allocate (Ctot(NumGas), CgB(NumGas), C0B(NumGas), C1B(NumGas))
    Allocate (Source0(NumGas), Henry(NumGas), K(NumGas), Mw(NumGas))

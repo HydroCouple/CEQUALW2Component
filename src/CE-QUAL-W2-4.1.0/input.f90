@@ -372,23 +372,6 @@ SUBROUTINE INPUT
    ALLOCATE (HAB(KMX, IMX))
    Allocate (IceQSS(IMX))  ! CEMA
 
-   !Added for C interoperability -- Caleb Buahin
-   QIND_P => QIND
-   TIND_P => TIND
-   NSTR_P => NSTR
-   NOUT_P => NOUT
-   KTWD_P => KTWD
-   KBWD_P => KBWD
-   KTWD_P => KTWD
-   KBWD_P => KBWD
-   KTW_P => KTW
-   KBW_P => KBW
-
-   QIND_CP = c_loc(QIND_P(1))
-   TIND_CP = c_loc(TIND_P(1))
-   NSTR_CP = c_loc(NSTR_P(1))
-
-
    ! BIOENERGETICS !mlm 
    IF (FISHBIO) THEN
       ALLOCATE (BIOD(NOD), BIOF(NOD), biodp(NOD))
@@ -781,7 +764,8 @@ SUBROUTINE INPUT
    kfname2(122) = 'DOH2S(kg/d)'; kfname2(123) = 'DOCH4(kg/d)'; kfname2(124) = 'H2SGASX(kg/d)'; kfname2(125) = 'CH4GASX(kg/d)'
    kfname2(126) = 'H2SDK(kg/d)'; kfname2(127) = 'CH4DK(kg/d)'; kfname2(128) = 'SD_C_IN(kg/d)'; kfname2(129) = 'SD_N_IN(kg/d)'
    kfname2(130) = 'SD_P_IN(kg/d)'
-   kfname2(131) = 'DOSEDIA(kg/d)'; kfname2(132) = 'Fe2D(kg/d)'; kfname2(133) = 'DOFe2(kg/d)'; kfname2(134) = 'SDINFeOOH(kg/d)'
+   kfname2(131) = 'DOSEDIA(kg/d)'; kfname2(132) = 'Fe2D(kg/d)'; kfname2(133) = 'DOFe2(kg/d)' 
+   kfname2(134) = 'SDINFeOOH(kg/d)'
    kfname2(135) = 'SDINMnO2(kg/d)'; kfname2(136) = 'Mn2d(kg/d)'; kfname2(137) = 'DOMn2(kg/d)'
    kfname2(138) = 'SEDD1(kg/d)'; kfname2(139) = 'SEDD2(kg/d)'
 ! CEMA end
@@ -1248,5 +1232,6 @@ SUBROUTINE INPUT
       ENDIF
    ENDDO
    IF (NGCTDG == 0) CDWBC(NDC + 1, :) = '     OFF'     ! SR 7/15/17
+
    RETURN
 END SUBROUTINE INPUT

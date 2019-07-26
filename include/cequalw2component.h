@@ -29,6 +29,7 @@
  */
 typedef int (*CE_QUAL_W2_Initialize)(const char modelDirectory[]);
 typedef int (*CE_QUAL_W2_Generic)();
+typedef int (*CE_QUAL_W2_GetArray)(int *key, void **outputArray);
 
 class Dimension;
 class Unit;
@@ -176,10 +177,11 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelCompo
     void *m_libHandle;
     CE_QUAL_W2_Initialize m_initializeFunction;
     CE_QUAL_W2_Generic m_prepareForUpdateFunction, m_updateFunction, m_finalizeFunction;
+    CE_QUAL_W2_GetArray m_getArrayFunction;
     int *m_startYear;
     double *m_startDateTime, *m_endDateTime, *m_currentDateTime;
-    int *m_NWB, *m_NBR, *m_KMX, *m_IMX, *m_NTR, *m_NST, *m_NWD, *n_NSTR;
-    double **m_QSTR,  **m_TaveSTR, *m_QIND, *m_TIND;
+    int *m_NWB, *m_NBR, *m_KMX, *m_IMX, *m_NTR, *m_NST, *m_NWD, *m_NSTR;
+    double *m_QSTR,  *m_TaveSTR, *m_QIND, *m_TIND;
     bool *m_modelFinished;
     double m_startJulianDate;
     Dimension *m_timeDimension;

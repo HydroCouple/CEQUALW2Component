@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "BranchOutput.h"
+#include "branchoutput.h"
 #include "core/dimension.h"
 #include "temporal/timedata.h"
 #include "core/valuedefinition.h"
@@ -84,8 +84,8 @@ void BranchOutput::updateValues()
   if(lastDateTime->julianDay() < m_cequalw2ModelComponent->currentDateTime()->julianDay())
   {
     moveDataToPrevTime();
-
     lastDateTime->setJulianDay(m_cequalw2ModelComponent->currentDateTime()->julianDay());
+    resetTimeSpan();
 
     switch (m_outputType)
     {
@@ -95,19 +95,14 @@ void BranchOutput::updateValues()
 
           for (int i = 0; i < size; i++)
           {
-            printf("Nums: %i\n", m_cequalw2ModelComponent->n_NSTR[i]);
-          }
-
-          for (int i = 0; i < size; i++)
-          {
             int nstr = 0;
             double value = 0.0;
 
-            if((nstr = m_cequalw2ModelComponent->n_NSTR[i]) > 0)
+            if((nstr = m_cequalw2ModelComponent->m_NSTR[i]) > 0)
             {
               for(int j = 0; j < nstr; j++)
               {
-                value += m_cequalw2ModelComponent->m_QSTR[j][i];
+                value += m_cequalw2ModelComponent->m_QSTR[j * size + i];
               }
             }
 
@@ -117,17 +112,18 @@ void BranchOutput::updateValues()
         break;
       case BranchOutput::Heat:
         {
-          for (int i = 0; i < identifiersInternal().size(); i++)
+          int size = *m_cequalw2ModelComponent->m_NBR;
+          for (int i = 0; i < size; i++)
           {
             int nstr = 0;
             double value = 0.0;
 
 
-            if((nstr = m_cequalw2ModelComponent->n_NSTR[i]) > 0)
+            if((nstr = m_cequalw2ModelComponent->m_NSTR[i]) > 0)
             {
               for(int j = 0; j < nstr; j++)
               {
-                value += m_cequalw2ModelComponent->m_QSTR[j][i] * m_cequalw2ModelComponent->m_TaveSTR[j][i] * 4184.0 * 1000.0;
+                value += m_cequalw2ModelComponent->m_QSTR[j * size + i] * m_cequalw2ModelComponent->m_TaveSTR[j * size + i] * 4184.0 * 1000.0;
               }
             }
 
