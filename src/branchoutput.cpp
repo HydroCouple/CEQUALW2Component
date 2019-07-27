@@ -8,7 +8,7 @@
 using namespace HydroCouple;
 using namespace SDKTemporal;
 
-BranchOutput::BranchOutput(const QString & id,
+CEQUALW2BranchOutput::CEQUALW2BranchOutput(const QString & id,
                            Dimension *identifierDimension,
                            const QStringList & identifiers,
                            Dimension *timeDimension,
@@ -41,13 +41,12 @@ BranchOutput::BranchOutput(const QString & id,
   addIdentifiers(identifiers);
 }
 
-BranchOutput::~BranchOutput()
+CEQUALW2BranchOutput::~CEQUALW2BranchOutput()
 {
 }
 
 
-
-void BranchOutput::updateValues(IInput *querySpecifier)
+void CEQUALW2BranchOutput::updateValues(IInput *querySpecifier)
 {
   if(!m_cequalw2ModelComponent->workflow())
   {
@@ -76,7 +75,7 @@ void BranchOutput::updateValues(IInput *querySpecifier)
   refreshAdaptedOutputs();
 }
 
-void BranchOutput::updateValues()
+void CEQUALW2BranchOutput::updateValues()
 {
   int lastDateTimeIndex = timeCount() - 1;
   DateTime *lastDateTime = timeInternal(lastDateTimeIndex);
@@ -89,7 +88,7 @@ void BranchOutput::updateValues()
 
     switch (m_outputType)
     {
-      case BranchOutput::Flow:
+      case CEQUALW2BranchOutput::Flow:
         {
           int size = *m_cequalw2ModelComponent->m_NBR;
 
@@ -110,7 +109,7 @@ void BranchOutput::updateValues()
           }
         }
         break;
-      case BranchOutput::Heat:
+      case CEQUALW2BranchOutput::Heat:
         {
           int size = *m_cequalw2ModelComponent->m_NBR;
           for (int i = 0; i < size; i++)

@@ -1,14 +1,14 @@
-#ifndef BRANCHINPUT_H
-#define BRANCHINPUT_H
+#ifndef CEQUALW2BranchInput_H
+#define CEQUALW2BranchInput_H
+
 #include "cequalw2component_global.h"
 #include "temporal/timeseriesidbasedexchangeitem.h"
+#include <unordered_map>
 
 class CEQUALW2Component;
 class Quantity;
 
-#include <unordered_map>
-
-class CEQUALW2COMPONENT_EXPORT BranchInput:
+class CEQUALW2COMPONENT_EXPORT CEQUALW2BranchInput:
     public TimeSeriesIdBasedInputDouble
 {
     Q_OBJECT
@@ -21,7 +21,7 @@ class CEQUALW2COMPONENT_EXPORT BranchInput:
       Temperature
     };
 
-    BranchInput(const QString &inputId,
+    CEQUALW2BranchInput(const QString &inputId,
                 const QStringList& identifiers,
                 InputType inputType,
                 Dimension *identifierDimension,
@@ -29,7 +29,7 @@ class CEQUALW2COMPONENT_EXPORT BranchInput:
                 Quantity *quantity,
                 CEQUALW2Component *cequalComponent);
 
-    virtual ~BranchInput() override;
+    virtual ~CEQUALW2BranchInput() override;
 
     bool setProvider(HydroCouple::IOutput *provider) override;
 
@@ -46,4 +46,4 @@ class CEQUALW2COMPONENT_EXPORT BranchInput:
 };
 
 
-#endif // BRANCHINPUT_H
+#endif // CEQUALW2BranchInput_H

@@ -11,6 +11,7 @@
 #include "core/abstractmodelcomponentinfo.h"
 
 typedef double (*AddFunction)(double *value);
+typedef void* VOID_P;
 
 class CEQUALW2Component;
 
@@ -29,6 +30,8 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2ComponentInfo : public AbstractModelCompo
 
 #ifdef _WIN32 // note the underscore: without it, it's not msdn official!
     static std::string getLastErrorAsString();
+
+    static std::wstring s2ws(const std::string& s);
 #endif
 
   private slots:
@@ -39,7 +42,7 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2ComponentInfo : public AbstractModelCompo
 
   private:
 
-    QHash<CEQUALW2Component*, QPair<QString,void *>> m_copiedLibraries;
+    QHash<CEQUALW2Component*, QPair<QString,VOID_P>> m_copiedLibraries;
 };
 
 Q_DECLARE_METATYPE(CEQUALW2ComponentInfo*)

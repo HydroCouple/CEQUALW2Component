@@ -1,23 +1,17 @@
-#ifndef BRANCHOUTPUT_H
-#define BRANCHOUTPUT_H
+#ifndef CEQUALW2BranchOutput_H
+#define CEQUALW2BranchOutput_H
 
 
-#include "hydrocoupletemporal.h"
+//#include "hydrocoupletemporal.h"
 #include "cequalw2component_global.h"
 #include "temporal/timeseriesidbasedexchangeitem.h"
-#include "spatiotemporal/timegeometryoutput.h"
+//#include "spatiotemporal/timegeometryoutput.h"
 
-class TimeSeriesProvider;
 class Quantity;
 class CEQUALW2Component;
-//class Dimension;
+class Dimension;
 
-//namespace SDKTemporal {
-//  class DateTime;
-//  class TimeSpan;
-//}
-
-class CEQUALW2COMPONENT_EXPORT BranchOutput: public TimeSeriesIdBasedOutputDouble
+class CEQUALW2COMPONENT_EXPORT CEQUALW2BranchOutput: public TimeSeriesIdBasedOutputDouble
 {
     Q_OBJECT
 
@@ -29,7 +23,7 @@ class CEQUALW2COMPONENT_EXPORT BranchOutput: public TimeSeriesIdBasedOutputDoubl
       Heat
     };
 
-    BranchOutput(const QString& id,
+    CEQUALW2BranchOutput(const QString& id,
                  Dimension* identifierDimension,
                  const QStringList & identifiers,
                  Dimension *timeDimension,
@@ -37,13 +31,11 @@ class CEQUALW2COMPONENT_EXPORT BranchOutput: public TimeSeriesIdBasedOutputDoubl
                  Quantity *valueDefinition,
                  CEQUALW2Component *component);
 
-    virtual ~BranchOutput() override;
+    virtual ~CEQUALW2BranchOutput() override;
 
     void updateValues(HydroCouple::IInput *querySpecifier) override;
 
     void updateValues() override;
-
-    TimeSeriesProvider *timeSeriesProvider() const;
 
   private:
     OutputType m_outputType;
@@ -52,4 +44,4 @@ class CEQUALW2COMPONENT_EXPORT BranchOutput: public TimeSeriesIdBasedOutputDoubl
 
 
 
-#endif // BRANCHOUTPUT_H
+#endif // CEQUALW2BranchOutput_H

@@ -235,7 +235,7 @@ CONFIG(debug, debug|release) {
    macx{
 
     QMAKE_POST_LINK += "cp -a ./../HydroCoupleSDK/build/debug/*HydroCoupleSDK.* ./build/debug/";
-    QMAKE_POST_LINK += "cp -a ./src/CE-QUAL-W2-4.1.0/*.dylib ./build/debug/";
+    QMAKE_POST_LINK += "cp -a ./src/CE_QUAL_W2.4.1.0/*.dylib ./build/debug/";
     LIBS += -L./../HydroCoupleSDK/build/debug -lHydroCoupleSDK
 
     }
@@ -243,15 +243,15 @@ CONFIG(debug, debug|release) {
    linux{
 
     QMAKE_POST_LINK += "cp -a ./../HydroCoupleSDK/build/debug/*HydroCoupleSDK.* ./build/debug/";
-    QMAKE_POST_LINK += "cp -a ./src/CE-QUAL-W2-4.1.0/CE-QUAL-W2-4.1.0.* ./build/debug/";
+    QMAKE_POST_LINK += "cp -a ./src/CE_QUAL_W2.4.1.0/CE-QUAL-W2-4.1.0.* ./build/debug/";
     LIBS += -L./../HydroCoupleSDK/build/debug -lHydroCoupleSDK
 
     }
 
    win32{
 
-    QMAKE_POST_LINK += "copy /B .\..\HydroCoupleSDK\build\debug\HydroCoupleSDK* .\build\debug"
-    QMAKE_POST_LINK += "copy /B .\src\CE-QUAL-W2-4.1.0.* .\build\debug"
+    QMAKE_POST_LINK += "copy /B .\..\HydroCoupleSDK\build\debug\HydroCoupleSDK* .\build\debug &&"
+    QMAKE_POST_LINK += "copy /B .\src\CE_QUAL_W2.4.1.0\CE-QUAL-W2-4.1.0.* .\build\debug"
     LIBS += -L./../HydroCoupleSDK/build/debug -lHydroCoupleSDK1
 
     }
@@ -287,7 +287,7 @@ CONFIG(release, debug|release) {
          #MacOS
          macx{
              DESTDIR = lib/macx
-             QMAKE_POST_LINK += "cp -a ./src/CE-QUAL-W2-4.1.0/*.dylib ./lib/macx/";
+             QMAKE_POST_LINK += "cp -a ./src/CE_QUAL_W2.4.1.0/*.dylib ./lib/macx/";
              QMAKE_POST_LINK += "cp -a ./../HydroCoupleSDK/lib/macx/*HydroCoupleSDK.* ./lib/macx/";
         }
 
@@ -301,8 +301,8 @@ CONFIG(release, debug|release) {
          #Windows
          win32{
              DESTDIR = lib/win32
-             QMAKE_POST_LINK += "copy /B .\src\CE-QUAL-W2-4.1.0\CE-QUAL-W2-4.1.0* .\lib\win32";
-             QMAKE_POST_LINK += "copy /B .\..\HydroCoupleSDK\lib\win32\HydroCoupleSDK* .\lib\win32";
+             QMAKE_POST_LINK += "copy /B .\src\CE-QUAL-W2-4.1.0\CE-QUAL-W2-4.1.0.* .\lib\win32 &&"
+             QMAKE_POST_LINK += "copy /B .\..\HydroCoupleSDK\lib\win32\HydroCoupleSDK* .\lib\win32"
         }
     } else {
          #MacOS

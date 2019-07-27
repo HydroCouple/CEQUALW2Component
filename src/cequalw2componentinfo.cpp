@@ -51,6 +51,8 @@ IModelComponent *CEQUALW2ComponentInfo::createComponentInstance()
   QString lib = filePath.dir().absolutePath() + "/CE_QUAL_W2.4.1.0.dylib";
 #endif
 
+  printf("%s\n", lib.toStdString().c_str());
+
   QFileInfo libInfo(lib);
 
   if(libInfo.exists() && libInfo.isFile())
@@ -60,8 +62,9 @@ IModelComponent *CEQUALW2ComponentInfo::createComponentInstance()
     QFile::copy(lib, libCopy);
 
 #ifdef _WIN32 // note the underscore: without it, it's not msdn official!
-    HMODULE *libHandle = LoadLibrary(lib.toStdString().c_str());
-
+    std::wstring wpath = s2ws(lib.toStdString().c_str());
+    HMODULE tHandle = LoadLibrary(wpath.c_str());
+    void *libHandle = (void*)tHandle;
     if(!libHandle)
     {
       printf("Error: %s\n", getLastErrorAsString().c_str());
@@ -111,6 +114,18 @@ std::string CEQUALW2ComponentInfo::getLastErrorAsString()
   LocalFree(messageBuffer);
 
   return message;
+}
+
+std::wstring CEQUALW2ComponentInfo::s2ws(const std::string& s)
+{
+    int len;
+    int slength = (int)s.length() + 1;
+    len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
+    wchar_t* buf = new wchar_t[len];
+    MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+    std::wstring r(buf);
+    delete[] buf;
+    return r;
 }
 #endif
 
@@ -173,3 +188,4 @@ void CEQUALW2ComponentInfo::deleteAllFilesAndHandles()
     }
   }
 }
+

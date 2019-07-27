@@ -39,8 +39,8 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelCompo
     public virtual HydroCouple::ICloneableModelComponent
 {
 
-    friend class BranchInput;
-    friend class BranchOutput;
+    friend class CEQUALW2BranchInput;
+    friend class CEQUALW2BranchOutput;
 
     Q_OBJECT
     Q_INTERFACES(HydroCouple::ICloneableModelComponent)
@@ -52,7 +52,7 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelCompo
      * \param id Unique identifier for this component instance.
      * \param modelComponentInfo the parent ModelComponentInfo that generated this component instance.
      */
-    CEQUALW2Component(const QString &id, void* libraryHandle,  CEQUALW2ComponentInfo* modelComponentInfo = nullptr);
+    CEQUALW2Component(const QString &id, VOID_P libraryHandle,  CEQUALW2ComponentInfo* modelComponentInfo = nullptr);
 
 
     /*!
@@ -165,6 +165,7 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelCompo
     double getCurrentJulianDateTime();
 
 
+
  signals:
 
     void onAboutToDelete(CEQUALW2Component *component);
@@ -174,20 +175,18 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelCompo
     IdBasedArgumentString *m_inputFilesArgument;
     CEQUALW2Component *m_parent = nullptr;
     QList<HydroCouple::ICloneableModelComponent*> m_clones;
-    void *m_libHandle;
+    VOID_P m_libHandle;
     CE_QUAL_W2_Initialize m_initializeFunction;
     CE_QUAL_W2_Generic m_prepareForUpdateFunction, m_updateFunction, m_finalizeFunction;
     CE_QUAL_W2_GetArray m_getArrayFunction;
     int *m_startYear;
     double *m_startDateTime, *m_endDateTime, *m_currentDateTime;
-    int *m_NWB, *m_NBR, *m_KMX, *m_IMX, *m_NTR, *m_NST, *m_NWD, *m_NSTR;
+    int *m_NWB =nullptr, *m_NBR, *m_KMX, *m_IMX, *m_NTR, *m_NST, *m_NWD, *m_NSTR;
     double *m_QSTR,  *m_TaveSTR, *m_QIND, *m_TIND;
     bool *m_modelFinished;
     double m_startJulianDate;
     Dimension *m_timeDimension;
-    Unit   *m_heatFluxUnit,
-    *m_temperatureUnit;
-
+    Unit   *m_heatFluxUnit, *m_temperatureUnit;
 
 };
 

@@ -15,8 +15,9 @@ using namespace HydroCouple;
 using namespace HydroCouple::Spatial;
 using namespace HydroCouple::Temporal;
 using namespace HydroCouple::SpatioTemporal;
+using namespace std;
 
-BranchInput::BranchInput(const QString &inputId,
+CEQUALW2BranchInput::CEQUALW2BranchInput(const QString &inputId,
                          const QStringList& identifiers,
                          InputType inputType,
                          Dimension *identifierDimension,
@@ -39,120 +40,120 @@ BranchInput::BranchInput(const QString &inputId,
   addIdentifiers(identifiers);
 }
 
-BranchInput::~BranchInput()
+CEQUALW2BranchInput::~CEQUALW2BranchInput()
 {
 
 }
 
-bool BranchInput::setProvider(HydroCouple::IOutput *provider)
+bool CEQUALW2BranchInput::setProvider(HydroCouple::IOutput *provider)
 {
   m_idMapping.clear();
 
   if(AbstractInput::setProvider(provider) && provider)
   {
-    ITimeGeometryComponentDataItem *timeGeometryDataItem = nullptr;
-    IGeometryComponentDataItem *geometryDataItem = nullptr;
-    IIdBasedComponentDataItem *idbasedDataItem = nullptr;
-    ITimeIdBasedComponentDataItem *timeIdBasedDataItem = nullptr;
+      ITimeGeometryComponentDataItem *timeGeometryDataItem = nullptr;
+      IGeometryComponentDataItem *geometryDataItem = nullptr;
+      IIdBasedComponentDataItem *idbasedDataItem = nullptr;
+      ITimeIdBasedComponentDataItem *timeIdBasedDataItem = nullptr;
 
-    QStringList ids = identifiers();
+      QStringList ids = identifiers();
 
-    if((timeGeometryDataItem = dynamic_cast<ITimeGeometryComponentDataItem*>(provider)))
-    {
-      if(timeGeometryDataItem->geometryCount())
+      if((timeGeometryDataItem = dynamic_cast<ITimeGeometryComponentDataItem*>(provider)))
       {
-        for(int i = 0; i < timeGeometryDataItem->geometryCount(); i++)
-        {
-          IGeometry *providerGeometry = timeGeometryDataItem->geometry(i);
-
-          for(int j = 0 ; j < ids.size(); j++)
+          if(timeGeometryDataItem->geometryCount())
           {
-            QString id = ids[j];
+              for(int i = 0; i < timeGeometryDataItem->geometryCount(); i++)
+              {
+                  IGeometry *providerGeometry = timeGeometryDataItem->geometry(i);
 
-            if(!QString::compare(providerGeometry->id(), id))
-            {
-              m_idMapping[i] = j;
-              break;
-            }
+                  for(int j = 0 ; j < ids.size(); j++)
+                  {
+                      QString id = ids[j];
+
+                      if(!QString::compare(providerGeometry->id(), id))
+                      {
+                          m_idMapping[i] = j;
+                          break;
+                      }
+                  }
+              }
           }
-        }
       }
-    }
-    else if((geometryDataItem = dynamic_cast<IGeometryComponentDataItem*>(provider)))
-    {
-      if(geometryDataItem->geometryCount())
+      else if((geometryDataItem = dynamic_cast<IGeometryComponentDataItem*>(provider)))
       {
-        for(int i = 0; i < geometryDataItem->geometryCount(); i++)
-        {
-          IGeometry *providerGeometry = geometryDataItem->geometry(i);
-
-          for(int j = 0 ; j < ids.size(); j++)
+          if(geometryDataItem->geometryCount())
           {
-            QString id = ids[j];
+              for(int i = 0; i < geometryDataItem->geometryCount(); i++)
+              {
+                  IGeometry *providerGeometry = geometryDataItem->geometry(i);
 
-            if(!QString::compare(providerGeometry->id(), id))
-            {
-              m_idMapping[i] = j;
-              break;
-            }
+                  for(int j = 0 ; j < ids.size(); j++)
+                  {
+                      QString id = ids[j];
+
+                      if(!QString::compare(providerGeometry->id(), id))
+                      {
+                          m_idMapping[i] = j;
+                          break;
+                      }
+                  }
+              }
           }
-        }
       }
-    }
-    else if((idbasedDataItem = dynamic_cast<IIdBasedComponentDataItem*>(provider)))
-    {
-      QStringList pIds = idbasedDataItem->identifiers();
-
-      if(pIds.size())
+      else if((idbasedDataItem = dynamic_cast<IIdBasedComponentDataItem*>(provider)))
       {
-        for(int i = 0; i < pIds.size(); i++)
-        {
-          QString pId = pIds[i];
+          QStringList pIds = idbasedDataItem->identifiers();
 
-          for(int j = 0 ; j < ids.size(); j++)
+          if(pIds.size())
           {
-            QString id = ids[j];
+              for(int i = 0; i < pIds.size(); i++)
+              {
+                  QString pId = pIds[i];
 
-            if(!QString::compare(pId, id))
-            {
-              m_idMapping[i] = j;
-              break;
-            }
+                  for(int j = 0 ; j < ids.size(); j++)
+                  {
+                      QString id = ids[j];
+
+                      if(!QString::compare(pId, id))
+                      {
+                          m_idMapping[i] = j;
+                          break;
+                      }
+                  }
+              }
           }
-        }
       }
-    }
-    else if((timeIdBasedDataItem = dynamic_cast<ITimeIdBasedComponentDataItem*>(provider)))
-    {
-      QStringList pIds = idbasedDataItem->identifiers();
-
-      if(pIds.size())
+      else if((timeIdBasedDataItem = dynamic_cast<ITimeIdBasedComponentDataItem*>(provider)))
       {
-        for(int i = 0; i < pIds.size(); i++)
-        {
-          QString pId = pIds[i];
+          QStringList pIds = idbasedDataItem->identifiers();
 
-          for(int j = 0 ; j < ids.size(); j++)
+          if(pIds.size())
           {
-            QString id = ids[j];
+              for(int i = 0; i < pIds.size(); i++)
+              {
+                  QString pId = pIds[i];
 
-            if(!QString::compare(pId, id))
-            {
-              m_idMapping[i] = j;
-              break;
-            }
+                  for(int j = 0 ; j < ids.size(); j++)
+                  {
+                      QString id = ids[j];
+
+                      if(!QString::compare(pId, id))
+                      {
+                          m_idMapping[i] = j;
+                          break;
+                      }
+                  }
+              }
           }
-        }
       }
-    }
 
-    return true;
+      return true;
   }
 
   return false;
 }
 
-bool BranchInput::canConsume(HydroCouple::IOutput *provider, QString &message) const
+bool CEQUALW2BranchInput::canConsume(HydroCouple::IOutput *provider, QString &message) const
 {
   message = "";
 
@@ -181,7 +182,7 @@ bool BranchInput::canConsume(HydroCouple::IOutput *provider, QString &message) c
   return false;
 }
 
-void BranchInput::retrieveValuesFromProvider()
+void CEQUALW2BranchInput::retrieveValuesFromProvider()
 {
   moveDataToPrevTime();
   int currentTimeIndex = timesInternal().size() - 1;
@@ -189,221 +190,221 @@ void BranchInput::retrieveValuesFromProvider()
   provider()->updateValues(this);
 }
 
-void BranchInput::applyData()
+void CEQUALW2BranchInput::applyData()
 {
-  ITimeGeometryComponentDataItem *timeGeometryDataItem = nullptr;
-  IGeometryComponentDataItem *geometryDataItem = nullptr;
-  IIdBasedComponentDataItem *idbasedDataItem = nullptr;
-  ITimeIdBasedComponentDataItem *timeIdBasedDataItem = nullptr;
+    ITimeGeometryComponentDataItem *timeGeometryDataItem = nullptr;
+    IGeometryComponentDataItem *geometryDataItem = nullptr;
+    IIdBasedComponentDataItem *idbasedDataItem = nullptr;
+    ITimeIdBasedComponentDataItem *timeIdBasedDataItem = nullptr;
 
-  if((timeGeometryDataItem = dynamic_cast<ITimeGeometryComponentDataItem*>(provider())))
-  {
-    double currentTime = m_cequalComponent->currentDateTime()->julianDay();
-
-    int currentTimeIndex = timeGeometryDataItem->timeCount() - 1;
-    int previousTimeIndex = std::max(0 , timeGeometryDataItem->timeCount() - 2);
-
-    double providerCurrentTime = timeGeometryDataItem->time(currentTimeIndex)->julianDay();
-    double providerPreviousTime = timeGeometryDataItem->time(previousTimeIndex)->julianDay();
-
-    if(currentTime >=  providerPreviousTime && currentTime <= providerCurrentTime)
+    if((timeGeometryDataItem = dynamic_cast<ITimeGeometryComponentDataItem*>(provider())))
     {
-      double factor = 0.0;
+        double currentTime = m_cequalComponent->currentDateTime()->julianDay();
 
-      if(providerCurrentTime > providerPreviousTime)
-      {
-        double denom = providerCurrentTime - providerPreviousTime;
-        double numer =currentTime - providerPreviousTime;
-        factor = numer / denom;
-      }
+        int currentTimeIndex = timeGeometryDataItem->timeCount() - 1;
+        int previousTimeIndex = max(0 , timeGeometryDataItem->timeCount() - 2);
 
-      switch (m_inputType)
-      {
-        case Inflow:
-          {
-            for(auto it : m_idMapping)
-            {
-              double value1 = 0;
-              double value2 = 0;
+        double providerCurrentTime = timeGeometryDataItem->time(currentTimeIndex)->julianDay();
+        double providerPreviousTime = timeGeometryDataItem->time(previousTimeIndex)->julianDay();
 
-              timeGeometryDataItem->getValue(currentTimeIndex,it.second, &value1);
-              timeGeometryDataItem->getValue(previousTimeIndex,it.second, &value2);
-              m_cequalComponent->m_QIND[it.first] = value2 + factor *(value1 - value2);
-            }
-          }
-          break;
-        case Temperature:
-          {
-            for(auto it : m_idMapping)
-            {
-              double value1 = 0;
-              double value2 = 0;
-
-              timeGeometryDataItem->getValue(currentTimeIndex,it.second, &value1);
-              timeGeometryDataItem->getValue(previousTimeIndex,it.second, &value2);
-              m_cequalComponent->m_TIND[it.first] = value2 + factor *(value1 - value2);
-            }
-          }
-          break;
-      }
-    }
-    else
-    {
-      switch (m_inputType)
-      {
-        case Inflow:
-          {
-            for(auto it : m_idMapping)
-            {
-              double value = 0;
-              timeGeometryDataItem->getValue(currentTimeIndex,it.second, & value);
-              m_cequalComponent->m_QIND[it.first] = value;
-            }
-          }
-          break;
-        case Temperature:
-          {
-            for(auto it : m_idMapping)
-            {
-              double value = 0;
-              timeGeometryDataItem->getValue(currentTimeIndex,it.second, & value);
-              m_cequalComponent->m_TIND[it.first] = value;
-            }
-          }
-          break;
-      }
-    }
-  }
-  else if((timeIdBasedDataItem = dynamic_cast<ITimeIdBasedComponentDataItem*>(provider())))
-  {
-    double currentTime = m_cequalComponent->currentDateTime()->julianDay();
-
-    int currentTimeIndex = timeIdBasedDataItem->timeCount() - 1;
-    int previousTimeIndex = std::max(0 , timeIdBasedDataItem->timeCount() - 2);
-
-    double providerCurrentTime = timeIdBasedDataItem->time(currentTimeIndex)->julianDay();
-    double providerPreviousTime = timeIdBasedDataItem->time(previousTimeIndex)->julianDay();
-
-    if(currentTime >=  providerPreviousTime && currentTime <= providerCurrentTime)
-    {
-      double factor = 0.0;
-
-      if(providerCurrentTime > providerPreviousTime)
-      {
-        double denom = providerCurrentTime - providerPreviousTime;
-        double numer =currentTime - providerPreviousTime;
-        factor = numer / denom;
-      }
-
-      switch (m_inputType)
-      {
-        case Inflow:
-          {
-            for(auto it : m_idMapping)
-            {
-              double value1 = 0;
-              double value2 = 0;
-
-              timeIdBasedDataItem->getValue(currentTimeIndex,it.second, &value1);
-              timeIdBasedDataItem->getValue(previousTimeIndex,it.second, &value2);
-              m_cequalComponent->m_QIND[it.first] = value2 + factor *(value1 - value2);
-            }
-          }
-          break;
-        case Temperature:
-          {
-            for(auto it : m_idMapping)
-            {
-              double value1 = 0;
-              double value2 = 0;
-
-              timeIdBasedDataItem->getValue(currentTimeIndex,it.second, &value1);
-              timeIdBasedDataItem->getValue(previousTimeIndex,it.second, &value2);
-              m_cequalComponent->m_TIND[it.first] = value2 + factor *(value1 - value2);
-            }
-          }
-          break;
-      }
-    }
-    else
-    {
-      switch (m_inputType)
-      {
-        case Inflow:
-          {
-            for(auto it : m_idMapping)
-            {
-              double value = 0;
-              timeIdBasedDataItem->getValue(currentTimeIndex,it.second, & value);
-              m_cequalComponent->m_QIND[it.first] = value;
-            }
-          }
-          break;
-        case Temperature:
-          {
-            for(auto it : m_idMapping)
-            {
-              double value = 0;
-              timeIdBasedDataItem->getValue(currentTimeIndex,it.second, & value);
-              m_cequalComponent->m_TIND[it.first] = value;
-            }
-          }
-          break;
-      }
-    }
-  }
-  else if((geometryDataItem = dynamic_cast<IGeometryComponentDataItem*>(provider())))
-  {
-    switch (m_inputType)
-    {
-      case Inflow:
+        if(currentTime >=  providerPreviousTime && currentTime <= providerCurrentTime)
         {
-          for(auto it : m_idMapping)
-          {
-            double value = 0;
-            geometryDataItem->getValue(it.second, &value);
-            m_cequalComponent->m_QIND[it.first] = value;
-          }
+            double factor = 0.0;
+
+            if(providerCurrentTime > providerPreviousTime)
+            {
+                double denom = providerCurrentTime - providerPreviousTime;
+                double numer =currentTime - providerPreviousTime;
+                factor = numer / denom;
+            }
+
+            switch (m_inputType)
+            {
+            case Inflow:
+            {
+                for(auto it : m_idMapping)
+                {
+                    double value1 = 0;
+                    double value2 = 0;
+
+                    timeGeometryDataItem->getValue(currentTimeIndex,it.second, &value1);
+                    timeGeometryDataItem->getValue(previousTimeIndex,it.second, &value2);
+                    m_cequalComponent->m_QIND[it.first] = value2 + factor *(value1 - value2);
+                }
+            }
+                break;
+            case Temperature:
+            {
+                for(auto it : m_idMapping)
+                {
+                    double value1 = 0;
+                    double value2 = 0;
+
+                    timeGeometryDataItem->getValue(currentTimeIndex,it.second, &value1);
+                    timeGeometryDataItem->getValue(previousTimeIndex,it.second, &value2);
+                    m_cequalComponent->m_TIND[it.first] = value2 + factor *(value1 - value2);
+                }
+            }
+                break;
+            }
         }
-        break;
-      case Temperature:
+        else
         {
-          for(auto it : m_idMapping)
-          {
-            double value = 0;
-            geometryDataItem->getValue(it.second, &value);
-            m_cequalComponent->m_TIND[it.first] = value;
-          }
+            switch (m_inputType)
+            {
+            case Inflow:
+            {
+                for(auto it : m_idMapping)
+                {
+                    double value = 0;
+                    timeGeometryDataItem->getValue(currentTimeIndex,it.second, & value);
+                    m_cequalComponent->m_QIND[it.first] = value;
+                }
+            }
+                break;
+            case Temperature:
+            {
+                for(auto it : m_idMapping)
+                {
+                    double value = 0;
+                    timeGeometryDataItem->getValue(currentTimeIndex,it.second, & value);
+                    m_cequalComponent->m_TIND[it.first] = value;
+                }
+            }
+                break;
+            }
         }
-        break;
     }
-  }
-  else if((idbasedDataItem = dynamic_cast<IIdBasedComponentDataItem*>(provider())))
-  {
-    switch (m_inputType)
+    else if((timeIdBasedDataItem = dynamic_cast<ITimeIdBasedComponentDataItem*>(provider())))
     {
-      case Inflow:
+        double currentTime = m_cequalComponent->currentDateTime()->julianDay();
+
+        int currentTimeIndex = timeIdBasedDataItem->timeCount() - 1;
+        int previousTimeIndex = max(0 , timeIdBasedDataItem->timeCount() - 2);
+
+        double providerCurrentTime = timeIdBasedDataItem->time(currentTimeIndex)->julianDay();
+        double providerPreviousTime = timeIdBasedDataItem->time(previousTimeIndex)->julianDay();
+
+        if(currentTime >=  providerPreviousTime && currentTime <= providerCurrentTime)
         {
-          for(auto it : m_idMapping)
-          {
-            double value = 0;
-            idbasedDataItem->getValue(it.second, &value);
-            m_cequalComponent->m_QIND[it.first] = value;
-          }
+            double factor = 0.0;
+
+            if(providerCurrentTime > providerPreviousTime)
+            {
+                double denom = providerCurrentTime - providerPreviousTime;
+                double numer =currentTime - providerPreviousTime;
+                factor = numer / denom;
+            }
+
+            switch (m_inputType)
+            {
+            case Inflow:
+            {
+                for(auto it : m_idMapping)
+                {
+                    double value1 = 0;
+                    double value2 = 0;
+
+                    timeIdBasedDataItem->getValue(currentTimeIndex,it.second, &value1);
+                    timeIdBasedDataItem->getValue(previousTimeIndex,it.second, &value2);
+                    m_cequalComponent->m_QIND[it.first] = value2 + factor *(value1 - value2);
+                }
+            }
+                break;
+            case Temperature:
+            {
+                for(auto it : m_idMapping)
+                {
+                    double value1 = 0;
+                    double value2 = 0;
+
+                    timeIdBasedDataItem->getValue(currentTimeIndex,it.second, &value1);
+                    timeIdBasedDataItem->getValue(previousTimeIndex,it.second, &value2);
+                    m_cequalComponent->m_TIND[it.first] = value2 + factor *(value1 - value2);
+                }
+            }
+                break;
+            }
         }
-        break;
-      case Temperature:
+        else
         {
-          for(auto it : m_idMapping)
-          {
-            double value = 0;
-            idbasedDataItem->getValue(it.second, &value);
-            m_cequalComponent->m_TIND[it.first] = value;
-          }
+            switch (m_inputType)
+            {
+            case Inflow:
+            {
+                for(auto it : m_idMapping)
+                {
+                    double value = 0;
+                    timeIdBasedDataItem->getValue(currentTimeIndex,it.second, & value);
+                    m_cequalComponent->m_QIND[it.first] = value;
+                }
+            }
+                break;
+            case Temperature:
+            {
+                for(auto it : m_idMapping)
+                {
+                    double value = 0;
+                    timeIdBasedDataItem->getValue(currentTimeIndex,it.second, & value);
+                    m_cequalComponent->m_TIND[it.first] = value;
+                }
+            }
+                break;
+            }
         }
-        break;
     }
-  }
+    else if((geometryDataItem = dynamic_cast<IGeometryComponentDataItem*>(provider())))
+    {
+        switch (m_inputType)
+        {
+        case Inflow:
+        {
+            for(auto it : m_idMapping)
+            {
+                double value = 0;
+                geometryDataItem->getValue(it.second, &value);
+                m_cequalComponent->m_QIND[it.first] = value;
+            }
+        }
+            break;
+        case Temperature:
+        {
+            for(auto it : m_idMapping)
+            {
+                double value = 0;
+                geometryDataItem->getValue(it.second, &value);
+                m_cequalComponent->m_TIND[it.first] = value;
+            }
+        }
+            break;
+        }
+    }
+    else if((idbasedDataItem = dynamic_cast<IIdBasedComponentDataItem*>(provider())))
+    {
+        switch (m_inputType)
+        {
+        case Inflow:
+        {
+            for(auto it : m_idMapping)
+            {
+                double value = 0;
+                idbasedDataItem->getValue(it.second, &value);
+                m_cequalComponent->m_QIND[it.first] = value;
+            }
+        }
+            break;
+        case Temperature:
+        {
+            for(auto it : m_idMapping)
+            {
+                double value = 0;
+                idbasedDataItem->getValue(it.second, &value);
+                m_cequalComponent->m_TIND[it.first] = value;
+            }
+        }
+            break;
+        }
+    }
 }
 
 
