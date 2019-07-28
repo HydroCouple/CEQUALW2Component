@@ -28,10 +28,12 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2ComponentInfo : public AbstractModelCompo
 
     HydroCouple::IModelComponent* createComponentInstance() override;
 
-#ifdef _WIN32 // note the underscore: without it, it's not msdn official!
+#ifdef _WIN32
+
+    static std::wstring utf8toUtf16(const std::string & str);
+
     static std::string getLastErrorAsString();
 
-    static std::wstring s2ws(const std::string& s);
 #endif
 
   private slots:

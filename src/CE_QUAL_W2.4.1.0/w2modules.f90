@@ -91,8 +91,10 @@ MODULE RSTART
   REAL(R8),          ALLOCATABLE, DIMENSION(:,:)     :: CMBRT
 END MODULE RSTART
 MODULE GLOBAL
+  !DEC$ ATTRIBUTES DLLEXPORT :: NWB, NBR, KMX, IMX, NTR, NST, NWD
   USE PREC
   USE iso_c_binding
+
   REAL*4                                             :: W2VER=4.1
   REAL(R8),   PARAMETER                              :: DAY=86400.0D0,  NONZERO=1.0D-20, REFL=0.94D0, FRAZDZ=0.14D0, DZMIN=1.4D-7
   REAL(R8),   PARAMETER                              :: AZMIN=1.4D-6, DZMAX=1.0D3,     RHOW=1000.0D0
@@ -208,7 +210,6 @@ USE PREC
 END MODULE SURFHE
 MODULE TVDC
   USE PREC
-  USE iso_c_binding
   REAL(R8),              ALLOCATABLE, DIMENSION(:)       :: QIN,    QTR,    QDTR,   PR,     ELUH,   ELDH,   QWD,    QSUM
   REAL(R8),              ALLOCATABLE, TARGET, DIMENSION(:)       :: TIN,    TTR,    TDTR,   TPR,    TOUT,   TWDO,   TIND,   QIND
   REAL(R8),              ALLOCATABLE, DIMENSION(:)       :: TAIR,   TDEW,   CLOUD,  PHI,    SRON
@@ -371,6 +372,7 @@ MODULE SELWC
   CHARACTER(8),          ALLOCATABLE, DIMENSION(:)    :: DYNSTRUC
 END MODULE SELWC
 MODULE GDAYC
+  !DEC$ ATTRIBUTES DLLEXPORT :: OR_YEAR
   USE iso_c_binding
   REAL                                           :: DAYM,   EQTNEW
   INTEGER                                        :: JDAYG,  IMON,   GDAY,  YEAR
@@ -379,6 +381,7 @@ MODULE GDAYC
   CHARACTER(9)                                   :: MONTH
 END MODULE GDAYC
 MODULE SCREENC
+  !DEC$ ATTRIBUTES DLLEXPORT :: JDAY
   USE PREC
   USE iso_c_binding
   
@@ -520,8 +523,9 @@ INTEGER :: ISTART(9),IEND(9)
 DATA CONE/1500/  !SW 5/26/15
 END MODULE ENVIRPMOD
 Module MAIN
-USE PREC
-USE iso_c_binding
+  !DEC$ ATTRIBUTES DLLEXPORT :: TMSTRT, TMEND, END_RUN
+  USE PREC
+  USE iso_c_binding
 ! Variable declaration
   Real(8), Allocatable, Dimension(:) :: IceQSS
   !INTEGER       :: J,NIW,NGC,NGCS,NTDS,NCCS,NGCE,NSSS,NSSE,NPO4,NNH4

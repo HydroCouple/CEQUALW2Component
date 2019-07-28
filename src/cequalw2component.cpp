@@ -36,6 +36,7 @@
 
 #ifdef _WIN32 // note the underscore: without it, it's not msdn official!
 #include <windows.h>
+#include <sstream>
 #else
 #include "dlfcn.h"
 #endif
@@ -96,11 +97,33 @@ void CEQUALW2Component::setFunctionPointers()
 
     if (m_libHandle != nullptr)
     {
+        auto checkerror = [](void* handle)
+        {
+            if(handle == nullptr)
+            {
+                std::ostringstream ss;
+                ss << GetLastError();
+                printf("Error: %s\n", ss.str().c_str());
+                return true;
+            }
+
+            return false;
+        };
+
         m_initializeFunction = (CE_QUAL_W2_Initialize)(GetProcAddress((HMODULE)m_libHandle, "CE_QUAL_W2_Initialize"));
+        checkerror(m_initializeFunction);
+
         m_updateFunction = (CE_QUAL_W2_Generic)(GetProcAddress((HMODULE)m_libHandle, "CE_QUAL_W2_Performstep"));
+        checkerror(m_updateFunction);
+
         m_finalizeFunction = (CE_QUAL_W2_Generic)(GetProcAddress((HMODULE)m_libHandle, "CE_QUAL_W2_Dispose"));
+        checkerror(m_finalizeFunction);
+
         m_prepareForUpdateFunction = (CE_QUAL_W2_Generic)(GetProcAddress((HMODULE)m_libHandle, "CE_QUAL_W2_PrepareForStep"));
+        checkerror(m_prepareForUpdateFunction);
+
         m_getArrayFunction = (CE_QUAL_W2_GetArray)(GetProcAddress((HMODULE)m_libHandle, "CE_QUAL_W2_GetArray"));
+        checkerror(m_getArrayFunction);
     }
     else
     {
@@ -404,6 +427,23 @@ bool CEQUALW2Component::initializeInputFilesArguments(QString &message)
     if(inputFile.dir().exists())
     {
         initializeFailureCleanUp();
+
+        if(m_libHandle == nullptr)
+        {
+            message = "CE-QUAL-W2 library could not be found";
+            return false;
+        }
+        else
+        {
+            if(m_initializeFunction == nullptr ||
+               m_prepareForUpdateFunction == nullptr ||
+               m_updateFunction == nullptr ||
+               m_finalizeFunction == nullptr)
+            {
+                message = "Pointer to function in CE-QUAL-W2 library could not be loaded";
+                return false;
+            }
+        }
 
         int initialized = (*m_initializeFunction)(inputFile.dir().absolutePath().toStdString().c_str());
 

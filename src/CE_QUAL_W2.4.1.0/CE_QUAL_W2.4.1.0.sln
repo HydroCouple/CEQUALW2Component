@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "CE-QUAL-W2-4.1.0", "CE-QUAL-W2-4.1.0.vfproj", "{446FAC7C-CF96-4A28-85B0-D4F95E699A65}"
+Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "CE_QUAL_W2.4.1.0", "CE_QUAL_W2.4.1.0.vfproj", "{446FAC7C-CF96-4A28-85B0-D4F95E699A65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

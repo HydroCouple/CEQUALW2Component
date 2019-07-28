@@ -27,9 +27,12 @@
 /*!
  *
  */
-typedef int (*CE_QUAL_W2_Initialize)(const char modelDirectory[]);
-typedef int (*CE_QUAL_W2_Generic)();
-typedef int (*CE_QUAL_W2_GetArray)(int *key, void **outputArray);
+extern "C"
+{
+    typedef int (*CE_QUAL_W2_Initialize)(const char modelDirectory[]);
+    typedef int (*CE_QUAL_W2_Generic)();
+    typedef int (*CE_QUAL_W2_GetArray)(int *key, void **outputArray);
+}
 
 class Dimension;
 class Unit;

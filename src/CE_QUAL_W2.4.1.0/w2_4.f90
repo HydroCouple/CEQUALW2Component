@@ -43,6 +43,8 @@ module CE_QUAL_W2_Model
 
 contains
     subroutine CE_QUAL_W2_GetArray(key, arrayPointer) bind(c, name="CE_QUAL_W2_GetArray")
+        !DEC$ ATTRIBUTES DLLEXPORT :: CE_QUAL_W2_GetArray
+        
         implicit none
         INTEGER(kind=c_int), INTENT(IN) :: key
         type(c_ptr), INTENT(OUT) :: arrayPointer
@@ -63,6 +65,7 @@ contains
     end subroutine
 
     integer(kind=c_int) function CE_QUAL_W2_Initialize(dirc) bind(C, name='CE_QUAL_W2_Initialize')
+       !DEC$ ATTRIBUTES DLLEXPORT :: CE_QUAL_W2_Initialize
         USE GLOBAL
         IMPLICIT NONE
 
@@ -304,6 +307,7 @@ contains
     end function CE_QUAL_W2_Initialize
 
     integer(c_int) function CE_QUAL_W2_PrepareForStep() bind(C, name='CE_QUAL_W2_PrepareForStep')
+       !DEC$ ATTRIBUTES DLLEXPORT :: CE_QUAL_W2_PrepareForStep
 
         CE_QUAL_W2_PrepareForStep = 0
 
@@ -315,6 +319,7 @@ contains
     end function CE_QUAL_W2_PrepareForStep
 
     integer(c_int) function CE_QUAL_W2_Performstep() bind(C, name='CE_QUAL_W2_Performstep')
+       !DEC$ ATTRIBUTES DLLEXPORT :: CE_QUAL_W2_Performstep
         use GLOBAL
         CE_QUAL_W2_Performstep = 0
 

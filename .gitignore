@@ -70,3 +70,6 @@ src/.DS_Store
 *.manifest
 .vs/
 *.u2d
+*.infoadvixe
+*.dflgadvixe
+src/CE_QUAL_W2.4.1.0/x64

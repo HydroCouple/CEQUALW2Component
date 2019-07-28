@@ -3,10 +3,12 @@
 #include "spatial/geometryfactory.h"
 #include "cequalw2component.h"
 
-
-
+#if _WIN32
+#include <sstream>
+#endif
 
 using namespace HydroCouple;
+using namespace std;
 
 CEQUALW2ComponentInfo::CEQUALW2ComponentInfo(QObject *parent)
   :AbstractModelComponentInfo(parent)
@@ -51,8 +53,6 @@ IModelComponent *CEQUALW2ComponentInfo::createComponentInstance()
   QString lib = filePath.dir().absolutePath() + "/CE_QUAL_W2.4.1.0.dylib";
 #endif
 
-  printf("%s\n", lib.toStdString().c_str());
-
   QFileInfo libInfo(lib);
 
   if(libInfo.exists() && libInfo.isFile())
@@ -62,10 +62,12 @@ IModelComponent *CEQUALW2ComponentInfo::createComponentInstance()
     QFile::copy(lib, libCopy);
 
 #ifdef _WIN32 // note the underscore: without it, it's not msdn official!
-    std::wstring wpath = s2ws(lib.toStdString().c_str());
+    std::string spath = lib.toStdString().c_str();
+    std::wstring wpath = utf8toUtf16(spath);
     HMODULE tHandle = LoadLibrary(wpath.c_str());
-    void *libHandle = (void*)tHandle;
-    if(!libHandle)
+    VOID_P libHandle = (VOID_P)tHandle;
+
+    if(tHandle == nullptr)
     {
       printf("Error: %s\n", getLastErrorAsString().c_str());
     }
@@ -96,37 +98,47 @@ IModelComponent *CEQUALW2ComponentInfo::createComponentInstance()
   }
 }
 
-#ifdef _WIN32 // note the underscore: without it, it's not msdn official!
+#ifdef _WIN32
+
+std::wstring CEQUALW2ComponentInfo::utf8toUtf16(const std::string & str)
+{
+   if (str.empty())
+      return wstring();
+
+   size_t charsNeeded = ::MultiByteToWideChar(CP_UTF8, 0,
+      str.data(), (int)str.size(), NULL, 0);
+   if (charsNeeded == 0)
+      throw runtime_error("Failed converting UTF-8 string to UTF-16");
+
+   vector<wchar_t> buffer(charsNeeded);
+   int charsConverted = ::MultiByteToWideChar(CP_UTF8, 0,
+      str.data(), (int)str.size(), &buffer[0], buffer.size());
+   if (charsConverted == 0)
+      throw runtime_error("Failed converting UTF-8 string to UTF-16");
+
+   return std::wstring(&buffer[0], charsConverted);
+}
+
+
 std::string CEQUALW2ComponentInfo::getLastErrorAsString()
 {
-  //Get the error message, if any.
-  DWORD errorMessageID = ::GetLastError();
-  if(errorMessageID == 0)
-    return std::string(); //No error message has been recorded
+    //Get the error message, if any.
+    DWORD errorMessageID = GetLastError();
+    if(errorMessageID == 0)
+        return std::string(); //No error message has been recorded
 
-  LPSTR messageBuffer = nullptr;
-  size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                               NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+    LPSTR messageBuffer = nullptr;
+    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
 
-  std::string message(messageBuffer, size);
+    std::string message(messageBuffer, size);
 
-  //Free the buffer.
-  LocalFree(messageBuffer);
+    //Free the buffer.
+    LocalFree(messageBuffer);
 
-  return message;
+    return message;
 }
 
-std::wstring CEQUALW2ComponentInfo::s2ws(const std::string& s)
-{
-    int len;
-    int slength = (int)s.length() + 1;
-    len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
-    wchar_t* buf = new wchar_t[len];
-    MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
-    std::wstring r(buf);
-    delete[] buf;
-    return r;
-}
 #endif
 
 void CEQUALW2ComponentInfo::onComponentDeleting(CEQUALW2Component *component)
