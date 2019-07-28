@@ -89,7 +89,6 @@
 		<File RelativePath=".\update.f90"/>
 		<File RelativePath=".\w2_4.f90"/>
 		<File RelativePath=".\w2modules.f90"/>
-		<File RelativePath=".\w2modules.f90"/>
 		<File RelativePath=".\water-quality.f90"/>
 		<File RelativePath=".\waterbody.f90"/>
 		<File RelativePath=".\withdrawal.f90"/>

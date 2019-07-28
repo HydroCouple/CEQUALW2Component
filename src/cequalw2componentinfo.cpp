@@ -43,9 +43,9 @@ IModelComponent *CEQUALW2ComponentInfo::createComponentInstance()
   QFileInfo filePath(libraryFilePath());
   QString extension = filePath.suffix();
 
-#ifdef _WIN32 // note the underscore: without it, it's not msdn official!
+#ifdef _WIN32
   QString lib = filePath.dir().absolutePath() + "/CE_QUAL_W2.4.1.0.dll";
-#elif __unix__ // all unices, not all compilers
+#elif __unix__
   QString lib = filePath.dir().absolutePath() + "/CE_QUAL_W2.so.4.1.0";
 #elif __linux__
   QString lib = filePath.dir().absolutePath() + "/CE_QUAL_W2.so.4.1.0";
@@ -57,30 +57,31 @@ IModelComponent *CEQUALW2ComponentInfo::createComponentInstance()
 
   if(libInfo.exists() && libInfo.isFile())
   {
-    //Initialize component with handle to library
     QString libCopy = filePath.dir().absolutePath() + "/" + QUuid::createUuid().toString().replace("{","").replace("}","") + filePath.fileName();
     QFile::copy(lib, libCopy);
 
-#ifdef _WIN32 // note the underscore: without it, it's not msdn official!
+#ifdef _WIN32
+
     std::string spath = lib.toStdString().c_str();
-    std::wstring wpath = utf8toUtf16(spath);
+    std::wstring wpath = CEQUALW2Component::utf8toUtf16(spath);
     HMODULE tHandle = LoadLibrary(wpath.c_str());
     VOID_P libHandle = (VOID_P)tHandle;
 
     if(tHandle == nullptr)
     {
-      printf("Error: %s\n", getLastErrorAsString().c_str());
+      printf("Error: %s\n", CEQUALW2Component::getLastErrorAsString().c_str());
     }
+
 #else
 
     void *libHandle = dlopen(libCopy.toStdString().c_str(), RTLD_LAZY|RTLD_LOCAL);
 
     if (libHandle == nullptr)
     {
-      /* fail to load the library */
       printf("Error: %s\n", dlerror());
       return nullptr;
     }
+
 #endif
 
     QString id =  QUuid::createUuid().toString();
@@ -97,49 +98,6 @@ IModelComponent *CEQUALW2ComponentInfo::createComponentInstance()
     return nullptr;
   }
 }
-
-#ifdef _WIN32
-
-std::wstring CEQUALW2ComponentInfo::utf8toUtf16(const std::string & str)
-{
-   if (str.empty())
-      return wstring();
-
-   size_t charsNeeded = ::MultiByteToWideChar(CP_UTF8, 0,
-      str.data(), (int)str.size(), NULL, 0);
-   if (charsNeeded == 0)
-      throw runtime_error("Failed converting UTF-8 string to UTF-16");
-
-   vector<wchar_t> buffer(charsNeeded);
-   int charsConverted = ::MultiByteToWideChar(CP_UTF8, 0,
-      str.data(), (int)str.size(), &buffer[0], buffer.size());
-   if (charsConverted == 0)
-      throw runtime_error("Failed converting UTF-8 string to UTF-16");
-
-   return std::wstring(&buffer[0], charsConverted);
-}
-
-
-std::string CEQUALW2ComponentInfo::getLastErrorAsString()
-{
-    //Get the error message, if any.
-    DWORD errorMessageID = GetLastError();
-    if(errorMessageID == 0)
-        return std::string(); //No error message has been recorded
-
-    LPSTR messageBuffer = nullptr;
-    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                                 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
-
-    std::string message(messageBuffer, size);
-
-    //Free the buffer.
-    LocalFree(messageBuffer);
-
-    return message;
-}
-
-#endif
 
 void CEQUALW2ComponentInfo::onComponentDeleting(CEQUALW2Component *component)
 {

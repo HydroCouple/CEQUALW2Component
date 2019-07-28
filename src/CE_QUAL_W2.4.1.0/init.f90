@@ -40,7 +40,7 @@ SUBROUTINE INIT
       NSPRF = 0; IZMIN = 0; KTWB = 2; KMIN = 1; IMIN = 1
       T1 = 0.0D0; T2 = 0.0D0; C1 = 0.0D0; C2 = 0.0D0; CD = 0.0; CIN = 0.0; C1S = 0.0; KF = 0.0; CMBRT = 0.0
       KFS = 0.0; U = 0.0D0; W = 0.0D0; SU = 0.0D0; SW = 0.0D0; SAZ = 0.0D0; AZ = 0.0D0; ESBR = 0.0; EPD = 0.0
-      ETBR = 0.0; EBRI = 0.0; DLTLIM = 0.0; VOLEV = 0.0; VOLPR = 0.0; &
+      ETBR = 0.0; EBRI = 0.0; DLTLIM = 0.0; VOLEV = 0.0; VOLPR = 0.0; 
       VOLDT = 0.0; VOLWD = 0.0; CURRENT = 0.0; VOLICE = 0.0; ICEBANK = 0.0
       VOLUH = 0.0; VOLDH = 0.0; VOLIN = 0.0; VOLOUT = 0.0; VOLSBR = 0.0; VOLTRB = 0.0; TSSS = 0.0; TSSB = 0.0; EF = 0.0
       TSSEV = 0.0; TSSPR = 0.0; TSSTR = 0.0; TSSDT = 0.0; TSSWD = 0.0; TSSUH = 0.0; TSSDH = 0.0; TSSIN = 0.0; CSSK = 0.0
@@ -48,7 +48,7 @@ SUBROUTINE INIT
       CSSDH1 = 0.0; CSSDH2 = 0.0; QIND = 0.0; TIND = 0.0; CIND = 0.0; SAVH2 = 0.0; SAVHR = 0.0; VOLUH2 = 0.0
       AVH1 = 0.0; AVH2 = 0.0; VOLDH2 = 0.0; Z = 0.0D0; QUH1 = 0.0D0; SED = 0.0; SEDC = 0.0; SEDN = 0.0
       VS = 0.0; YS = 0.0; YST = 0.0; VST = 0.0; DTP = 0.0; QOLD = 0.0; QSUM = 0.0; VOLTBR = 0.0; DLVOL = 0.0; EVBR = 0.0 ! SW 7/24/2017
-      TPOUT = 0.0; TPTRIB = 0.0; TPDTRIB = 0.0; TPWD = 0.0; TPPR = 0.0; TPIN = 0.0; &
+      TPOUT = 0.0; TPTRIB = 0.0; TPDTRIB = 0.0; TPWD = 0.0; TPPR = 0.0; TPIN = 0.0;
       TNOUT = 0.0; TNTRIB = 0.0; TNDTRIB = 0.0; TNWD = 0.0; TNPR = 0.0; TNIN = 0.0; TN_SEDSOD_NH4 = 0.0; TP_SEDSOD_PO4 = 0.0   ! SW 2/19/16  TP_SEDBURIAL=0.0;TN_SEDBURIAL=0.0;
       SEDP = 0.0; ICETH = 0.0; PFLUXIN = 0.0; NFLUXIN = 0.0                                    ! SW 4/19/10
       ZMIN = -1000.0

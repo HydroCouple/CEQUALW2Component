@@ -24,15 +24,11 @@
 #include "cequalw2componentinfo.h"
 #include "temporal/abstracttimemodelcomponent.h"
 
-/*!
- *
- */
-extern "C"
-{
-    typedef int (*CE_QUAL_W2_Initialize)(const char modelDirectory[]);
-    typedef int (*CE_QUAL_W2_Generic)();
-    typedef int (*CE_QUAL_W2_GetArray)(int *key, void **outputArray);
-}
+
+typedef int (*CE_QUAL_W2_Initialize)(const char modelDirectory[]);
+typedef int (*CE_QUAL_W2_Generic)();
+typedef int (*CE_QUAL_W2_GetArray)(int *key, void **outputArray);
+
 
 class Dimension;
 class Unit;
@@ -110,6 +106,15 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelCompo
      */
     QList<HydroCouple::ICloneableModelComponent*> clones() const override;
 
+
+#ifdef _WIN32
+
+    static std::wstring utf8toUtf16(const std::string & str);
+
+    static std::string getLastErrorAsString();
+
+#endif
+
   protected:
 
     bool removeClone(CEQUALW2Component *component);
@@ -119,6 +124,7 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2Component : public AbstractTimeModelCompo
      * \brief intializeFailureCleanUp
      */
     void initializeFailureCleanUp() override;
+
 
   private:
 

@@ -28,14 +28,6 @@ class CEQUALW2COMPONENT_EXPORT CEQUALW2ComponentInfo : public AbstractModelCompo
 
     HydroCouple::IModelComponent* createComponentInstance() override;
 
-#ifdef _WIN32
-
-    static std::wstring utf8toUtf16(const std::string & str);
-
-    static std::string getLastErrorAsString();
-
-#endif
-
   private slots:
 
     void onComponentDeleting(CEQUALW2Component *component);

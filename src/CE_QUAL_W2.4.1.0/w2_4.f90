@@ -1497,7 +1497,7 @@ IF (CELERITY_LIMIT(JW)) CELRTY = SQRT((ABS(RHO(KB(I), I) - RHO(KT, I)))/1000.0*G
     end function CE_QUAL_W2_Performstep
 
     integer(c_int) function CE_QUAL_W2_Dispose() bind(C, name='CE_QUAL_W2_Dispose')
-
+        !DEC$ ATTRIBUTES DLLEXPORT :: CE_QUAL_W2_Dispose
         IF (STOP_PUSHED) THEN
         TEXT = 'Execution stopped at '//CCTIME(1:2)//':'//CCTIME(3:4)//':'//CCTIME(5:6)//' on '//CDATE(5:6)//'/'//CDATE(7:8)//'/' &
                 //CDATE(3:4)

@@ -44,6 +44,7 @@
 
 
 using namespace HydroCouple;
+using namespace std;
 
 CEQUALW2Component::CEQUALW2Component(const QString &id, VOID_P libraryHandle, CEQUALW2ComponentInfo *modelComponentInfo)
     : AbstractTimeModelComponent(id, modelComponentInfo),
@@ -101,9 +102,7 @@ void CEQUALW2Component::setFunctionPointers()
         {
             if(handle == nullptr)
             {
-                std::ostringstream ss;
-                ss << GetLastError();
-                printf("Error: %s\n", ss.str().c_str());
+                printf("Error: %s\n", getLastErrorAsString().c_str());
                 return true;
             }
 
@@ -215,7 +214,10 @@ void CEQUALW2Component::update(const QList<HydroCouple::IOutput*> &requiredOutpu
                     if(progressChecker()->performStep(*m_currentDateTime))
                     {
                         setStatus(IModelComponent::Updated , "Simulation performed time-step | DateTime: " + QString::number(getCurrentJulianDateTime(), 'f') , progressChecker()->progress());
+
                     }
+
+                    currentDateTimeInternal()->setJulianDay(getCurrentJulianDateTime());
                 }
                 else
                 {
@@ -377,6 +379,48 @@ void CEQUALW2Component::initializeFailureCleanUp()
 
 }
 
+#ifdef _WIN32
+
+std::wstring CEQUALW2Component::utf8toUtf16(const std::string & str)
+{
+   if (str.empty())
+      return wstring();
+
+   size_t charsNeeded = ::MultiByteToWideChar(CP_UTF8, 0,
+      str.data(), (int)str.size(), NULL, 0);
+   if (charsNeeded == 0)
+      throw runtime_error("Failed converting UTF-8 string to UTF-16");
+
+   vector<wchar_t> buffer(charsNeeded);
+   int charsConverted = ::MultiByteToWideChar(CP_UTF8, 0,
+      str.data(), (int)str.size(), &buffer[0], buffer.size());
+   if (charsConverted == 0)
+      throw runtime_error("Failed converting UTF-8 string to UTF-16");
+
+   return std::wstring(&buffer[0], charsConverted);
+}
+
+std::string CEQUALW2Component::getLastErrorAsString()
+{
+    //Get the error message, if any.
+    DWORD errorMessageID = GetLastError();
+    if(errorMessageID == 0)
+        return std::string(); //No error message has been recorded
+
+    LPSTR messageBuffer = nullptr;
+    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+
+    std::string message(messageBuffer, size);
+
+    //Free the buffer.
+    LocalFree(messageBuffer);
+
+    return message;
+}
+
+#endif
+
 void CEQUALW2Component::createArguments()
 {
     createInputFileArguments();
@@ -435,12 +479,24 @@ bool CEQUALW2Component::initializeInputFilesArguments(QString &message)
         }
         else
         {
-            if(m_initializeFunction == nullptr ||
-               m_prepareForUpdateFunction == nullptr ||
-               m_updateFunction == nullptr ||
-               m_finalizeFunction == nullptr)
+            if(m_initializeFunction == nullptr)
             {
-                message = "Pointer to function in CE-QUAL-W2 library could not be loaded";
+                message = "Pointer to initialize function in CE-QUAL-W2 library could not be loaded";
+                return false;
+            }
+            else if(m_prepareForUpdateFunction == nullptr)
+            {
+                message = "Pointer to prepare for step function in CE-QUAL-W2 library could not be loaded";
+                return false;
+            }
+            else if(m_updateFunction == nullptr)
+            {
+                message = "Pointer to update function in CE-QUAL-W2 library could not be loaded";
+                return false;
+            }
+            else if(m_finalizeFunction == nullptr)
+            {
+                message = "Pointer to function finalize in CE-QUAL-W2 library could not be loaded";
                 return false;
             }
         }
@@ -450,9 +506,9 @@ bool CEQUALW2Component::initializeInputFilesArguments(QString &message)
 #ifdef _WIN32 // note the underscore: without it, it's not msdn official!
 
         m_startYear = (int*)GetProcAddress((HMODULE)m_libHandle, "GDAYC_YEAR");
-        m_startDateTime = (double*)GetProcAddress((HMODULE)m_libHandle, "TMSTRT");
-        m_endDateTime = (double*)GetProcAddress((HMODULE)m_libHandle, "TMEND");
-        m_currentDateTime = (double*)GetProcAddress((HMODULE)m_libHandle, "JDAY");
+        m_startDateTime = (double*)GetProcAddress((HMODULE)m_libHandle, "MAIN_TMSTRT");
+        m_endDateTime = (double*)GetProcAddress((HMODULE)m_libHandle, "MAIN_TMEND");
+        m_currentDateTime = (double*)GetProcAddress((HMODULE)m_libHandle, "SCREENC_JDAY");
         m_modelFinished  = (bool*)GetProcAddress((HMODULE)m_libHandle, "MAIN_END_RUN");
 
         m_NWB = (int*)GetProcAddress((HMODULE)m_libHandle,"GLOBAL_NWB");
@@ -462,8 +518,6 @@ bool CEQUALW2Component::initializeInputFilesArguments(QString &message)
         m_NTR = (int*)GetProcAddress((HMODULE)m_libHandle,"GLOBAL_NTR");
         m_NST = (int*)GetProcAddress((HMODULE)m_libHandle,"GLOBAL_NST");
         m_NWD = (int*)GetProcAddress((HMODULE)m_libHandle,"GLOBAL_NWD");
-        m_NSTR = (int*)GetProcAddress((HMODULE)m_libHandle,"SELWC_NSTR");
-
 #else
         m_startYear = (int*)dlsym(m_libHandle, "GDAYC_YEAR");
         m_startDateTime = (double*)dlsym(m_libHandle, "MAIN_TMSTRT");
@@ -564,43 +618,42 @@ void CEQUALW2Component::createInputs()
 
 void CEQUALW2Component::createOutputs()
 {
-//    QStringList branchIdentifiers;
+    QStringList branchIdentifiers;
 
-//    for (int i = 1; i <= (*m_NBR); i++)
-//    {
-//        QString id = "BR" + QString::number(i);
-//        branchIdentifiers.push_back(id);
-//    }
+    for (int i = 1; i <= (*m_NBR); i++)
+    {
+        QString id = "BR" + QString::number(i);
+        branchIdentifiers.push_back(id);
+    }
 
-//    Quantity *flowQuantity = Quantity::flowInCMS(this);
-//    Quantity *heatQuantity = new Quantity(QVariant::Double, m_heatFluxUnit, this);
-//    Dimension *branchIdentifiersDimension = new Dimension("BranchIdentifiersDimension",this);
+    Quantity *flowQuantity = Quantity::flowInCMS(this);
+    Quantity *heatQuantity = new Quantity(QVariant::Double, m_heatFluxUnit, this);
+    Dimension *branchIdentifiersDimension = new Dimension("BranchIdentifiersDimension",this);
 
-//    CEQUALW2BranchOutput *flowOutput = new CEQUALW2BranchOutput("OutletStructuresFlow",
-//                                                branchIdentifiersDimension,
-//                                                branchIdentifiers,
-//                                                m_timeDimension,
-//                                                CEQUALW2BranchOutput::Flow,
-//                                                flowQuantity,
-//                                                this);
-//    flowOutput->setCaption("Flow From Outlet Structures (m^3/s)");
+    CEQUALW2BranchOutput *flowOutput = new CEQUALW2BranchOutput("OutletStructuresFlow",
+                                                branchIdentifiersDimension,
+                                                branchIdentifiers,
+                                                m_timeDimension,
+                                                CEQUALW2BranchOutput::Flow,
+                                                flowQuantity,
+                                                this);
+    flowOutput->setCaption("Flow From Outlet Structures (m^3/s)");
 
 
-//    CEQUALW2BranchOutput *heatOutput = new CEQUALW2BranchOutput("OutletStructuresHeat",
-//                                                branchIdentifiersDimension,
-//                                                branchIdentifiers,
-//                                                m_timeDimension,
-//                                                CEQUALW2BranchOutput::Heat,
-//                                                heatQuantity,
-//                                                this);
-//    heatOutput->setCaption("Heat From Outlet Structures (J/s)");
+    CEQUALW2BranchOutput *heatOutput = new CEQUALW2BranchOutput("OutletStructuresHeat",
+                                                branchIdentifiersDimension,
+                                                branchIdentifiers,
+                                                m_timeDimension,
+                                                CEQUALW2BranchOutput::Heat,
+                                                heatQuantity,
+                                                this);
+    heatOutput->setCaption("Heat From Outlet Structures (J/s)");
 
-//    addOutput(flowOutput);
-//    addOutput(heatOutput);
+    addOutput(flowOutput);
+    addOutput(heatOutput);
 }
 
 double CEQUALW2Component::getCurrentJulianDateTime()
 {
-//    return  m_startJulianDate + ((*m_currentDateTime)-(*m_startDateTime));
-    return 0.0;
+    return  m_startJulianDate + ((*m_currentDateTime)-(*m_startDateTime));
 }
