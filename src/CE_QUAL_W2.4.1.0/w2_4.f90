@@ -29,7 +29,8 @@ module CE_QUAL_W2_Model
     use cstr
 
     !DEC$ IF (_WIN32)
-    USE IFPORT
+    !Not needed with gfortran
+    !USE IFPORT
     !DEC$ ENDIF
 
     implicit none
@@ -1521,7 +1522,7 @@ PROGRAM CE_QUAL_W2
     !!!!DEC$ATTRIBUTES REFERENCE :: Dlg
 
     !DEC$ IF (_WIN32)
-    USE IFPORT
+    ! USE IFPORT
     !DEC$ END IF
 
     USE MAIN
