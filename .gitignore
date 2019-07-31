@@ -52,7 +52,6 @@ CMakeLists.txt.user*
 ./build
 ./debug
 Makefile.Debug
-Makefile
 Makefile.Release
 CEQUALW2Component_resource.rc
 *.pch
@@ -73,3 +72,4 @@ src/.DS_Store
 *.infoadvixe
 *.dflgadvixe
 src/CE_QUAL_W2.4.1.0/x64
+./Makefile
